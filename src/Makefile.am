@@ -1,4 +1,3 @@
-
 bin_PROGRAMS = ssga grab sphere run
 run_SOURCES = run.cpp
 ssga_SOURCES = ssga.cpp
