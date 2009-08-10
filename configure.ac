@@ -20,8 +20,13 @@ AX_CHECK_GLU
 AX_CHECK_GLUT
 
 AC_CHECK_LIB(ode, dWorldSetGravity, 
-                   ODE_LIBS="-lode"; AC_SUBST(ODE_LIBS), 
+                   ODE_LIBS="-lode -ldrawstuff"; AC_SUBST(ODE_LIBS), 
                    AC_MSG_ERROR([libode not found.]), )
+
+AC_CHECK_LIB(drawstuff, dsDrawBoxD, 
+                   DRAWSTUFF_LIBS="-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++ -ldrawstuff"; AC_SUBST(DRAWSTUFF_LIBS), 
+                   AC_MSG_ERROR([libdrawstuff not found.]), -lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++)
+#$GL_LIBS $GLU_LIBS $GLUT_LIBS)
 
 AC_CHECK_LIB(json, json_object_new_object, 
                    JSON_LIBS="-ljson"; AC_SUBST(JSON_LIBS), 
@@ -30,6 +35,9 @@ AC_CHECK_LIB(json, json_object_new_object,
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdio.h])
+AC_CHECK_HEADERS([ode/ode.h])
+AC_CHECK_HEADERS([json/json.h])
+AC_CHECK_HEADERS([drawstuff/drawstuff.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 

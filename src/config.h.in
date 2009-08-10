@@ -3,6 +3,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Define to 1 if you have the <drawstuff/drawstuff.h> header file. */
+#undef HAVE_DRAWSTUFF_DRAWSTUFF_H
+
 /* Define to 1 if you have the <GLUT/glut.h> header file. */
 #undef HAVE_GLUT_GLUT_H
 
@@ -18,8 +21,14 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the <json/json.h> header file. */
+#undef HAVE_JSON_JSON_H
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <ode/ode.h> header file. */
+#undef HAVE_ODE_ODE_H
 
 /* Define to 1 if you have the <OpenGL/glu.h> header file. */
 #undef HAVE_OPENGL_GLU_H
