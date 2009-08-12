@@ -37,7 +37,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ac_path_generic.m4 \
+	$(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
 	$(top_srcdir)/m4/ax_check_glu.m4 \
 	$(top_srcdir)/m4/ax_check_glut.m4 \
@@ -76,6 +77,9 @@ GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
+ALPS_CFLAGS = @ALPS_CFLAGS@
+ALPS_CONFIG = @ALPS_CONFIG@
+ALPS_LIBS = @ALPS_LIBS@
 AMTAR = @AMTAR@
 AR = @AR@
 AUTOCONF = @AUTOCONF@

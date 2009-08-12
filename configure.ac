@@ -32,6 +32,10 @@ AC_CHECK_LIB(json, json_object_new_object,
                    JSON_LIBS="-ljson"; AC_SUBST(JSON_LIBS), 
                    AC_MSG_ERROR([libjson not found.]), )
 
+AC_PATH_GENERIC(alps, , , 
+                AC_MSG_ERROR([alps-config not found]), 
+                alps-config, --cflags, --ldflags)
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdio.h])

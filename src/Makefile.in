@@ -33,13 +33,14 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = ssga$(EXEEXT) grab$(EXEEXT) sphere$(EXEEXT) \
-	run$(EXEEXT) readbest$(EXEEXT) readgrab$(EXEEXT) \
-	readspheric$(EXEEXT) visual$(EXEEXT) readrun$(EXEEXT)
+	run$(EXEEXT) readgrab$(EXEEXT) readspheric$(EXEEXT) \
+	visual$(EXEEXT) readrun$(EXEEXT) runalps$(EXEEXT)
 subdir = src
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ac_path_generic.m4 \
+	$(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
 	$(top_srcdir)/m4/ax_check_glu.m4 \
 	$(top_srcdir)/m4/ax_check_glut.m4 \
@@ -53,43 +54,43 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_grab_OBJECTS = grab.$(OBJEXT)
+am_grab_OBJECTS = grab.$(OBJEXT) debug.$(OBJEXT)
 grab_OBJECTS = $(am_grab_OBJECTS)
 grab_LDADD = $(LDADD)
-am_readbest_OBJECTS = readbest.$(OBJEXT)
-readbest_OBJECTS = $(am_readbest_OBJECTS)
-readbest_LDADD = $(LDADD)
-readbest_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(readbest_LDFLAGS) $(LDFLAGS) -o $@
-am_readgrab_OBJECTS = readgrab.$(OBJEXT)
+am_readgrab_OBJECTS = readgrab.$(OBJEXT) debug.$(OBJEXT)
 readgrab_OBJECTS = $(am_readgrab_OBJECTS)
 readgrab_LDADD = $(LDADD)
 readgrab_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(readgrab_LDFLAGS) $(LDFLAGS) -o $@
-am_readrun_OBJECTS = readrun.$(OBJEXT)
+am_readrun_OBJECTS = readrun.$(OBJEXT) debug.$(OBJEXT)
 readrun_OBJECTS = $(am_readrun_OBJECTS)
 readrun_LDADD = $(LDADD)
 readrun_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(readrun_LDFLAGS) $(LDFLAGS) -o $@
-am_readspheric_OBJECTS = readspheric.$(OBJEXT)
+am_readspheric_OBJECTS = readspheric.$(OBJEXT) debug.$(OBJEXT)
 readspheric_OBJECTS = $(am_readspheric_OBJECTS)
 readspheric_LDADD = $(LDADD)
 readspheric_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(readspheric_LDFLAGS) $(LDFLAGS) -o $@
-am_run_OBJECTS = run.$(OBJEXT)
+am_run_OBJECTS = run.$(OBJEXT) debug.$(OBJEXT)
 run_OBJECTS = $(am_run_OBJECTS)
 run_LDADD = $(LDADD)
-am_sphere_OBJECTS = sphere.$(OBJEXT)
+am_runalps_OBJECTS = runalps-runalps.$(OBJEXT) runalps-debug.$(OBJEXT)
+runalps_OBJECTS = $(am_runalps_OBJECTS)
+runalps_LDADD = $(LDADD)
+runalps_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(runalps_LDFLAGS) $(LDFLAGS) -o $@
+am_sphere_OBJECTS = sphere.$(OBJEXT) debug.$(OBJEXT)
 sphere_OBJECTS = $(am_sphere_OBJECTS)
 sphere_LDADD = $(LDADD)
-am_ssga_OBJECTS = ssga.$(OBJEXT)
+am_ssga_OBJECTS = ssga.$(OBJEXT) debug.$(OBJEXT)
 ssga_OBJECTS = $(am_ssga_OBJECTS)
 ssga_LDADD = $(LDADD)
-am_visual_OBJECTS = visual.$(OBJEXT)
+am_visual_OBJECTS = visual.$(OBJEXT) debug.$(OBJEXT)
 visual_OBJECTS = $(am_visual_OBJECTS)
 visual_LDADD = $(LDADD)
 visual_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -98,6 +99,15 @@ visual_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -107,16 +117,19 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(grab_SOURCES) $(readbest_SOURCES) $(readgrab_SOURCES) \
-	$(readrun_SOURCES) $(readspheric_SOURCES) $(run_SOURCES) \
+SOURCES = $(grab_SOURCES) $(readgrab_SOURCES) $(readrun_SOURCES) \
+	$(readspheric_SOURCES) $(run_SOURCES) $(runalps_SOURCES) \
 	$(sphere_SOURCES) $(ssga_SOURCES) $(visual_SOURCES)
-DIST_SOURCES = $(grab_SOURCES) $(readbest_SOURCES) $(readgrab_SOURCES) \
-	$(readrun_SOURCES) $(readspheric_SOURCES) $(run_SOURCES) \
+DIST_SOURCES = $(grab_SOURCES) $(readgrab_SOURCES) $(readrun_SOURCES) \
+	$(readspheric_SOURCES) $(run_SOURCES) $(runalps_SOURCES) \
 	$(sphere_SOURCES) $(ssga_SOURCES) $(visual_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+ALPS_CFLAGS = @ALPS_CFLAGS@
+ALPS_CONFIG = @ALPS_CONFIG@
+ALPS_LIBS = @ALPS_LIBS@
 AMTAR = @AMTAR@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
@@ -241,25 +254,29 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-run_SOURCES = run.cpp
-ssga_SOURCES = ssga.cpp
-grab_SOURCES = grab.cpp
-sphere_SOURCES = sphere.cpp
-readbest_SOURCES = readbest.cpp
-readbest_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readspheric_SOURCES = readspheric.cpp
+run_SOURCES = run.cpp debug.c
+runalps_SOURCES = runalps.cpp debug.c individ_animat.h
+runalps_CPPFLAGS = $(CPPFLAGS) $(ALPS_CFLAGS)
+runalps_LDFLAGS = $(LDFLAGS) $(ALPS_LIBS)
+ssga_SOURCES = ssga.cpp debug.c
+grab_SOURCES = grab.cpp debug.c
+sphere_SOURCES = sphere.cpp debug.c
+
+#readbest_SOURCES = readbest.cpp
+#readbest_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+readspheric_SOURCES = readspheric.cpp debug.c
 readspheric_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-visual_SOURCES = visual.cpp
+visual_SOURCES = visual.cpp debug.c
 visual_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readrun_SOURCES = readrun.cpp
+readrun_SOURCES = readrun.cpp debug.c
 readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readgrab_SOURCES = readgrab.cpp
+readgrab_SOURCES = readgrab.cpp debug.c
 readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
+.SUFFIXES: .c .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -337,9 +354,6 @@ clean-binPROGRAMS:
 grab$(EXEEXT): $(grab_OBJECTS) $(grab_DEPENDENCIES) 
 	@rm -f grab$(EXEEXT)
 	$(CXXLINK) $(grab_OBJECTS) $(grab_LDADD) $(LIBS)
-readbest$(EXEEXT): $(readbest_OBJECTS) $(readbest_DEPENDENCIES) 
-	@rm -f readbest$(EXEEXT)
-	$(readbest_LINK) $(readbest_OBJECTS) $(readbest_LDADD) $(LIBS)
 readgrab$(EXEEXT): $(readgrab_OBJECTS) $(readgrab_DEPENDENCIES) 
 	@rm -f readgrab$(EXEEXT)
 	$(readgrab_LINK) $(readgrab_OBJECTS) $(readgrab_LDADD) $(LIBS)
@@ -352,6 +366,9 @@ readspheric$(EXEEXT): $(readspheric_OBJECTS) $(readspheric_DEPENDENCIES)
 run$(EXEEXT): $(run_OBJECTS) $(run_DEPENDENCIES) 
 	@rm -f run$(EXEEXT)
 	$(CXXLINK) $(run_OBJECTS) $(run_LDADD) $(LIBS)
+runalps$(EXEEXT): $(runalps_OBJECTS) $(runalps_DEPENDENCIES) 
+	@rm -f runalps$(EXEEXT)
+	$(runalps_LINK) $(runalps_OBJECTS) $(runalps_LDADD) $(LIBS)
 sphere$(EXEEXT): $(sphere_OBJECTS) $(sphere_DEPENDENCIES) 
 	@rm -f sphere$(EXEEXT)
 	$(CXXLINK) $(sphere_OBJECTS) $(sphere_LDADD) $(LIBS)
@@ -368,15 +385,52 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readbest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readgrab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readrun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readspheric.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/run.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runalps-debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runalps-runalps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphere.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssga.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/visual.Po@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+runalps-debug.o: debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT runalps-debug.o -MD -MP -MF $(DEPDIR)/runalps-debug.Tpo -c -o runalps-debug.o `test -f 'debug.c' || echo '$(srcdir)/'`debug.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/runalps-debug.Tpo $(DEPDIR)/runalps-debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='debug.c' object='runalps-debug.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o runalps-debug.o `test -f 'debug.c' || echo '$(srcdir)/'`debug.c
+
+runalps-debug.obj: debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT runalps-debug.obj -MD -MP -MF $(DEPDIR)/runalps-debug.Tpo -c -o runalps-debug.obj `if test -f 'debug.c'; then $(CYGPATH_W) 'debug.c'; else $(CYGPATH_W) '$(srcdir)/debug.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/runalps-debug.Tpo $(DEPDIR)/runalps-debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='debug.c' object='runalps-debug.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o runalps-debug.obj `if test -f 'debug.c'; then $(CYGPATH_W) 'debug.c'; else $(CYGPATH_W) '$(srcdir)/debug.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -398,6 +452,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+runalps-runalps.o: runalps.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT runalps-runalps.o -MD -MP -MF $(DEPDIR)/runalps-runalps.Tpo -c -o runalps-runalps.o `test -f 'runalps.cpp' || echo '$(srcdir)/'`runalps.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/runalps-runalps.Tpo $(DEPDIR)/runalps-runalps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='runalps.cpp' object='runalps-runalps.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o runalps-runalps.o `test -f 'runalps.cpp' || echo '$(srcdir)/'`runalps.cpp
+
+runalps-runalps.obj: runalps.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT runalps-runalps.obj -MD -MP -MF $(DEPDIR)/runalps-runalps.Tpo -c -o runalps-runalps.obj `if test -f 'runalps.cpp'; then $(CYGPATH_W) 'runalps.cpp'; else $(CYGPATH_W) '$(srcdir)/runalps.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/runalps-runalps.Tpo $(DEPDIR)/runalps-runalps.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='runalps.cpp' object='runalps-runalps.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o runalps-runalps.obj `if test -f 'runalps.cpp'; then $(CYGPATH_W) 'runalps.cpp'; else $(CYGPATH_W) '$(srcdir)/runalps.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

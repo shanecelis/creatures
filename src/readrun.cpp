@@ -15,24 +15,23 @@ void simLoop2 (int pause)
 {
     simLoop(pause);
 
-    if (tot_time == TIMEEVAL)
-    {
-	tot_time = 0;
+    if (tot_time == TIMEEVAL) {
+            tot_time = 0;
 
-	bestdist1 = Ani1.getTotalDamage() + 0.01;
-    bestdist2 = 0.0;
-	//bestdist2 = Ani2.getTotalDamage() + 0.01;
-	result = (bestdist2 - bestdist1) / 
-	    (bestdist2 + bestdist1);
+            bestdist1 = Ani1.getTotalDamage() + 0.01;
+            bestdist2 = 0.0;
+            //bestdist2 = Ani2.getTotalDamage() + 0.01;
+            result = (bestdist2 - bestdist1) / 
+                (bestdist2 + bestdist1);
 
-	myprintf("\nResult: damage1=%f, damage2=%f, score=%f\n",
-		bestdist1, bestdist2, result);
+            myprintf("\nResult: damage1=%f, damage2=%f, score=%f\n",
+                     bestdist1, bestdist2, result);
 
-	Ani1.remove();
-	resetScene();
-	Ani1.generate(0, 0, 0);
-	Ani1.setImmunityTimer(PRELIMTIME);
-	Ani1.pushBehindXVert(0);
+            Ani1.remove();
+            resetScene();
+            Ani1.generate(0, 0, 0);
+            Ani1.setImmunityTimer(PRELIMTIME);
+            Ani1.pushBehindXVert(0);
     }
 }
 
@@ -62,9 +61,9 @@ int main (int argc, char **argv)
     
     
     /*for (int i=0; i < MAXGENES; i++)
-	for (int j=0; j < MAXNEUR; j++)
-	    for (int k=0; k < MAXCONFROM; k++)
-		Ani1.genome[i].neurons[j].confrom[k].reftype = REFBOTH;*/
+      for (int j=0; j < MAXNEUR; j++)
+      for (int k=0; k < MAXCONFROM; k++)
+      Ani1.genome[i].neurons[j].confrom[k].reftype = REFBOTH;*/
 
     resetScene();
 

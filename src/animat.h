@@ -1,16 +1,18 @@
 // (c) The university of Birmingham and quite possibly the University of
 // Portsmouth, 2004-2007.
 // Academic and educational uses only.
+#ifndef _ANIMAT_H_
+#define _ANIMAT_H_
 
 
-//#define DRAWSTUFF 1
+
 #include <ode/ode.h>
 #ifdef DRAWSTUFF
 #include <drawstuff/drawstuff.h>
 #endif
-#include <stdlib.h>
 #include <time.h>
 #include <json/json.h>
+#include "debug.h"
 
 // Refuses conns from actuators !
 // But allows them from self !
@@ -85,9 +87,6 @@
 #define SENSUPDOWN 9
 #define SENSLEFTRIGHT 10
 
-#define TOFILE 54
-#define TONULL 55
-#define TOSTDOUT 56
 
 #define REFBOTH 44
 #define REFORIG 45
@@ -135,7 +134,7 @@ int NOACTUATE = 0;
 int BALL = 0;
 int CORRIDOR = 0;
 int WALLS = 0;
-int OUTPUTREDIRECT = TONULL;
+
 dReal GRAVCORR = 4.0 / (dReal) WORLDRADIUS;
 dWorldID world;
 dMatrix3 IDENTITY;
@@ -143,64 +142,6 @@ dSpaceID globalspace;
 dSpaceID alternatespace; // only used within collision method
 double upDown = 0.0f;
 double leftRight = 0.0f;
-
-// First, a few utility function for displaying messages or saving them to
-// disk...
-
-FILE *OUTPUTFILE;
-
-void myprintf(const char *msg, ...)
-{
-    static va_list argp;
-    static int nbcalls=0;
-    if (OUTPUTREDIRECT == TONULL) return;
-    if (OUTPUTREDIRECT == TOFILE)
-    {
-        if (nbcalls == 0)
-            OUTPUTFILE = fopen("./output", "w");
-        if (nbcalls == 50) fflush(OUTPUTFILE);
-        if (nbcalls == 10000)
-        {
-            nbcalls = 1;
-            fclose(OUTPUTFILE);
-            OUTPUTFILE = fopen("./output", "w");
-        }
-        va_start(argp, msg);
-        vfprintf(OUTPUTFILE, msg, argp);
-        va_end(argp);
-    }
-    else if (OUTPUTREDIRECT == TOSTDOUT)
-    {
-        va_start(argp, msg);
-        vprintf(msg, argp);
-        va_end(argp);
-    }
-
-}
-
-void myexit(int i)
-{
-    myprintf("Exiting |\n");
-    if (OUTPUTFILE) fflush(OUTPUTFILE);
-    exit(i);
-}
-
-
-// exits program, write reason to "exitmessage.txt"
-void mydie(const char *msg, ...)
-{
-    va_list argp;
-    FILE *out;
-    vprintf(msg, argp);
-    fflush(stdout);
-    out = fopen("exitmessage.txt", "w");
-    va_start(argp, msg);
-    vfprintf(out, msg, argp);
-    va_end(argp);
-    fflush(out);
-    myexit(-1);
-}
-
 
 dReal gauss(dReal std)
 {
@@ -496,9 +437,6 @@ public:
     }
 
 };
-
-
-void ph() { myprintf("Hello/\n"); }
 
 class Ball {
 public:
@@ -4211,4 +4149,4 @@ void initWorld()
 
     
 }
-    
+#endif /* _ANIMAT_H_ */

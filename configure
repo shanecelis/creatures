@@ -792,6 +792,9 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+ALPS_LIBS
+ALPS_CFLAGS
+ALPS_CONFIG
 JSON_LIBS
 DRAWSTUFF_LIBS
 ODE_LIBS
@@ -925,6 +928,8 @@ enable_libtool_lock
 with_pic
 with_tags
 with_x
+with_alps_prefix
+with_alps_exec_prefix
 '
       ac_precious_vars='build_alias
 host_alias
@@ -943,7 +948,10 @@ F77
 FFLAGS
 XMKMF
 GL_CFLAGS
-GL_LIBS'
+GL_LIBS
+ALPS_CONFIG
+ALPS_CFLAGS
+ALPS_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1594,6 +1602,10 @@ Optional Packages:
                           both]
   --with-tags[=TAGS]      include additional configurations [automatic]
   --with-x                use the X Window System
+  --with-alps-prefix=PREFIX
+                          Prefix where alps is installed (optional)
+  --with-alps-exec-prefix=PREFIX
+                          Exec prefix where alps is installed (optional)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1612,6 +1624,9 @@ Some influential environment variables:
   XMKMF       Path to xmkmf, Makefile generator for X Window System
   GL_CFLAGS   CFLAGS used for GL
   GL_LIBS     LIBS used for GL
+  ALPS_CONFIG config script used for alps
+  ALPS_CFLAGS CFLAGS used for the alps
+  ALPS_LIBS   LIBS used for the alps
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -4918,7 +4933,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4921 "configure"' > conftest.$ac_ext
+  echo '#line 4936 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7212,11 +7227,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7215: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7230: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7219: \$? = $ac_status" >&5
+   echo "$as_me:7234: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7502,11 +7517,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7505: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7520: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7509: \$? = $ac_status" >&5
+   echo "$as_me:7524: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -7606,11 +7621,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7609: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7624: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7613: \$? = $ac_status" >&5
+   echo "$as_me:7628: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9991,7 +10006,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9994 "configure"
+#line 10009 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10091,7 +10106,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10094 "configure"
+#line 10109 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12519,11 +12534,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12522: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12537: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12526: \$? = $ac_status" >&5
+   echo "$as_me:12541: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -12623,11 +12638,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12626: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12641: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12630: \$? = $ac_status" >&5
+   echo "$as_me:12645: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14185,11 +14200,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14188: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14203: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14192: \$? = $ac_status" >&5
+   echo "$as_me:14207: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14289,11 +14304,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14292: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14307: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14296: \$? = $ac_status" >&5
+   echo "$as_me:14311: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16484,11 +16499,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16487: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16502: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16491: \$? = $ac_status" >&5
+   echo "$as_me:16506: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16774,11 +16789,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16777: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16792: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16781: \$? = $ac_status" >&5
+   echo "$as_me:16796: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16878,11 +16893,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16881: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16896: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16885: \$? = $ac_status" >&5
+   echo "$as_me:16900: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -23105,6 +23120,126 @@ else
 $as_echo "$as_me: error: libjson not found." >&2;}
    { (exit 1); exit 1; }; }
 fi
+
+
+
+
+# Check whether --with-alps-prefix was given.
+if test "${with_alps_prefix+set}" = set; then
+  withval=$with_alps_prefix; alps_config_prefix="$withval"
+else
+  alps_config_prefix=""
+fi
+
+
+# Check whether --with-alps-exec-prefix was given.
+if test "${with_alps_exec_prefix+set}" = set; then
+  withval=$with_alps_exec_prefix; alps_config_exec_prefix="$withval"
+else
+  alps_config_exec_prefix=""
+fi
+
+
+
+
+
+  if test x$alps_config_exec_prefix != x ; then
+     alps_config_args="$alps_config_args --exec-prefix=$alps_config_exec_prefix"
+     if test x${ALPS_CONFIG+set} != xset ; then
+       ALPS_CONFIG=$alps_config_exec_prefix/bin/alps-config
+     fi
+  fi
+  if test x$alps_config_prefix != x ; then
+     alps_config_args="$alps_config_args --prefix=$alps_config_prefix"
+     if test x${ALPS_CONFIG+set} != xset ; then
+       ALPS_CONFIG=$alps_config_prefix/bin/alps-config
+     fi
+  fi
+
+  for ac_prog in alps-config alps-config alps-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_ALPS_CONFIG+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $ALPS_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ALPS_CONFIG="$ALPS_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ALPS_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ALPS_CONFIG=$ac_cv_path_ALPS_CONFIG
+if test -n "$ALPS_CONFIG"; then
+  { $as_echo "$as_me:$LINENO: result: $ALPS_CONFIG" >&5
+$as_echo "$ALPS_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$ALPS_CONFIG" && break
+done
+test -n "$ALPS_CONFIG" || ALPS_CONFIG="no"
+
+  { $as_echo "$as_me:$LINENO: checking for alps" >&5
+$as_echo_n "checking for alps... " >&6; }
+  no_alps=""
+  if test "$ALPS_CONFIG" = "no" ; then
+     no_alps=yes
+  else
+
+        ALPS_CFLAGS="`$ALPS_CONFIG $alps_config_args --cflags`"
+
+
+        ALPS_LIBS="`$ALPS_CONFIG $alps_config_args --ldflags`"
+
+
+  fi
+  if test "x$no_alps" = x ; then
+     { $as_echo "$as_me:$LINENO: result: yes" >&5
+$as_echo "yes" >&6; }
+     :
+  else
+     { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+     if test "$ALPS_CONFIG" = "no" ; then
+       echo "*** The alps-config script installed by alps could not be found"
+       echo "*** If alps was installed in PREFIX, make sure PREFIX/bin is in"
+       echo "*** your path, or set the ALPS_CONFIG environment variable to the"
+       echo "*** full path to alps-config."
+     fi
+     ALPS_CFLAGS=""
+     ALPS_LIBS=""
+     { { $as_echo "$as_me:$LINENO: error: alps-config not found" >&5
+$as_echo "$as_me: error: alps-config not found" >&2;}
+   { (exit 1); exit 1; }; }
+  fi
+
+
+
+
+
 
 
 # Checks for header files.
