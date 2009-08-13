@@ -1,4 +1,3 @@
-#define DRAWSTUFF
 #include "sphere.h"
 
 

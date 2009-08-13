@@ -19,3 +19,6 @@
 /config.log
 /Makefile
 /src/runalps
+/src/.libs/
+/src/animat.lo
+/src/libanimat.la

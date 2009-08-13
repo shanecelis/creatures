@@ -1,5 +1,6 @@
-#define DRAWSTUFF
 #include "animat.h"
+
+
 
 #define TIMEEVAL 10000
 #define PRELIMTIME 1000

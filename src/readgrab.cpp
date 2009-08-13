@@ -1,4 +1,3 @@
-#define DRAWSTUFF
 #include "animat.h"
 
 #define TIMEEVAL 10000
