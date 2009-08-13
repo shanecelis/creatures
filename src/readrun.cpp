@@ -11,27 +11,32 @@ void initScene2();
 Animat Ani1;
 int i;
 double *Apos, *Bpos, dist1, dist2, bestdist1, bestdist2, result;
+dReal oldPos[3];
+dReal newPos[3];
 
 void simLoop2 (int pause)
 {
     simLoop(pause);
 
+    const dReal *pos = dBodyGetPosition(Ani1.limbs[0].id);
+    newPos[0] = pos[0];
+    newPos[1] = pos[1];
+    newPos[2] = pos[2];
+    dsDrawLine(oldPos, newPos);
+
     if (tot_time == TIMEEVAL) {
             tot_time = 0;
 
-            bestdist1 = Ani1.getTotalDamage() + 0.01;
-            bestdist2 = 0.0;
-            //bestdist2 = Ani2.getTotalDamage() + 0.01;
-            result = (bestdist2 - bestdist1) / 
-                (bestdist2 + bestdist1);
-
-            myprintf("\nResult: damage1=%f, damage2=%f, score=%f\n",
-                     bestdist1, bestdist2, result);
+            dReal result = 0.0f;
+            for (int i = 0; i < 3; i++) {
+                result += (oldPos[i] - newPos[i]) * (oldPos[i] - newPos[i]);
+            }
+            myprintf("\nResult: %f\n", result);
 
             Ani1.remove();
             resetScene();
             Ani1.generate(0, 0, 0);
-            Ani1.setImmunityTimer(PRELIMTIME);
+            //Ani1.setImmunityTimer(PRELIMTIME);
             Ani1.pushBehindXVert(0);
     }
 }
@@ -72,6 +77,12 @@ int main (int argc, char **argv)
     Ani1.setImmunityTimer(PRELIMTIME);
     Ani1.displayRepres();
 	Ani1.pushBehindXVert(0);
+
+    const dReal *pos = dBodyGetPosition(Ani1.limbs[0].id);
+    oldPos[0] = pos[0];
+    oldPos[1] = pos[1];
+    oldPos[2] = pos[2];
+
     
     printf("OK\n");
     dsSimulationLoop (argc,argv,352,288,&fn);

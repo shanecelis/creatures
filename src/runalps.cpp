@@ -176,7 +176,7 @@ void replace(Animat *elim, Animat *A, Animat *B)
     elim->age = max(A->age, B->age) + 1;
 }
 
-double eval (Animat *A)
+double eval(Animat *A)
 {
     //cerr << "begin eval" << endl;
     int nbsteps;
@@ -195,8 +195,14 @@ double eval (Animat *A)
     oldPos[1] = pos[1];
     oldPos[2] = pos[2];
 
-    for (nbsteps = 0; nbsteps < TIMEEVAL; nbsteps++)
-        doWorld(0, STEP, true);
+    for (nbsteps = 0; nbsteps < TIMEEVAL; nbsteps++) {
+        try {
+            doWorld(0, STEP, true);
+        } catch (...) {
+            A->remove();
+            return 0.0f;
+        }
+    }
     
     pos = dBodyGetPosition(A->limbs[0].id);
     dReal newPos[3];
@@ -278,7 +284,7 @@ bool evaluate_individ(vector<double>& fitness, Individual* individ)
   }
 
   Individ_Animat* ind = (Individ_Animat*) individ;
-  fitness[0] = 1.0/eval(ind->animat);
+  fitness[0] = eval(ind->animat);
   return true;
 }
 
@@ -294,13 +300,13 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     // Configuration for a regular EA/GA:
     Number_Layers = 1;
     layer_def.set_select_type(ALPS_SELECT_TOURN);
-    layer_def.set_size(100); //10
-    layer_def.set_elitism(10); //1
-    layer_def.set_tourn_size(10);
+    layer_def.set_size(10); //100
+    layer_def.set_elitism(1); //10
+    layer_def.set_tourn_size(5);
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0); // 1.0
     pop->set_print_results_rate(1);//400); // 400
-    pop->set_max_gen(30);
+    pop->set_max_gen(2);
   } else if (type == 2) {
     Number_Layers = 5;
     age_gap = 10; //4
@@ -321,6 +327,7 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     return;
   }
 
+  pop->set_maximize();
   pop->config_layers_same(age_scheme, age_gap,
 			  Number_Layers, layer_def);
   pop->print_layers();
@@ -337,17 +344,16 @@ void *ea_engine(void *arg1)
   fitness.resize(1);
 
   // Configure a generational ALPS population:
-  Alps *Population = new AlpsGen("animat", individ_config);
-  setup_pop_gen(individ_config, (AlpsGen*)Population);
+  Alps *pop = new AlpsGen("animat", individ_config);
+  setup_pop_gen(individ_config, (AlpsGen*)pop);
 
-  Population->set_print_debug(true);
-  Population->set_minimize();
-  Population->write_header(cout);
+  pop->set_print_debug(true);
+  pop->write_header(cout);
 
-  while (! Population->is_finished()) {
+  while (! pop->is_finished()) {
     int index;
     Individual* individ;
-    int res = Population->get_next_individ(index, individ);
+    int res = pop->get_next_individ(index, individ);
     if (res == -1) {
       continue; // Get another index / Try again.
 
@@ -361,15 +367,15 @@ void *ea_engine(void *arg1)
     int result = evaluate_individ(fitness, individ);
     if (result == false) {
       // Error evaluating this individual.
-      Population->evaluate_error(index, individ);
+      pop->evaluate_error(index, individ);
     } else {
       // Evaluated successfully.
-      Population->insert_evaluated(fitness, index, individ, 0);
+      pop->insert_evaluated(fitness, index, individ, 0);
     }
     // How do I know when a generation is over?
   }
   // Let's save the best one.
-  Individ_Animat* ind = (Individ_Animat*) Population->get_individual(0);
+  Individ_Animat* ind = (Individ_Animat*) pop->get_individual(0);
   ind->animat->save("best.json");
   printf("EA engine ended.\n");
 

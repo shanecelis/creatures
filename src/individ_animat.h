@@ -19,23 +19,31 @@ class Individ_Animat : public Individual {
         }
     };
     void initialize() {
-        cerr << "init" << endl;
+        cerr << "initialize" << endl;
+        Individual::initialize();
         animat = new Animat();
     };
 
-    bool keep(bool maximize) {
-        return true;
-    }
+/*     bool keep(bool maximize) { */
+/*         return valid(); */
+/*     } */
 
     Individual* new_instance() {
         return new Individ_Animat();
     }
     bool valid() {
-        return true;
+        try {
+            animat->checkGenome();
+            animat->checkConnections();
+            return ! isColliding(animat);
+        } catch (...) {
+            return false;
+        }
     }
     
     void make_random() {
         cerr << "random" << endl;
+        Individual::make_random();
         animat->randGenome();
         int wrong = 0;
         int count = 0;
@@ -51,20 +59,22 @@ class Individ_Animat : public Individual {
         //return ! wrong;
     };
     
-    void duplicate_settings(Individual *individ2) {        
+    void duplicate_settings(Individual *ind) {        
         cerr << "duplicate_settings" << endl;
-        Individual::duplicate_settings(individ2);
+        Individual::duplicate_settings(ind);
     };
 
     void duplicate(Individual *ind) {
         cerr << "duplicate" << endl;
         duplicate_settings(ind);
+        Individual::duplicate(ind);
         Individ_Animat* other = (Individ_Animat *) ind;
         animat->copyFrom(other->animat);
     };
     
     bool mutate() {
         cerr << "mutate" << endl;
+        Individual::mutate();
         int wrong = 0;
         int count = 0;
         do { 
@@ -81,6 +91,7 @@ class Individ_Animat : public Individual {
     
     bool recombine(Individual *ind) {
         cerr << "recombine" << endl;
+        Individual::recombine(ind);
         Individ_Animat* other = (Individ_Animat *) ind;
         int wrong = 0;
         animat->crossWith(other->animat);
@@ -96,6 +107,10 @@ class Individ_Animat : public Individual {
         } while (wrong && count < 100);
         return ! wrong;
     };
+
+    bool recombine_rand2(Individual *ind) {
+        return recombine(ind);
+    }
 
 /*     //int phenotype_distance(Individual* ind2); */
 /*     bool make_phenotype(void* arg); */

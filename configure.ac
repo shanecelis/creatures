@@ -23,12 +23,26 @@ AC_CHECK_LIB(ode, dWorldSetGravity,
                    ODE_LIBS="-lode"; AC_SUBST(ODE_LIBS), 
                    AC_MSG_ERROR([libode not found.]), )
 
+OS=`uname -s`
+AC_SUBST(OS)
+case $OS in
+     Darwin)
+        DRAWSTUFF_DEP="-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++";
+        ;;
+     Linux)
+        DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS";
+        ;;
+        *)
+        DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS";
+        ;;
+esac
+
+DRAWSTUFF_LIBS=""
 AC_CHECK_LIB(drawstuff, dsDrawBoxD, 
-                   DRAWSTUFF_LIBS="-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++ -ldrawstuff"; AC_SUBST(DRAWSTUFF_LIBS), 
-                   AC_MSG_WARN([libdrawstuff not found.]), 
-#-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++)
-$GL_LIBS $GLU_LIBS $GLUT_LIBS)
-AM_CONDITIONAL([DRAWSTUFF], [true])#[test -n "$DRAWSTUFF_LIBS"])
+                   DRAWSTUFF_LIBS="$DRAWSTUFF_DEP -ldrawstuff"; AC_SUBST(DRAWSTUFF_LIBS), 
+                   AC_MSG_WARN([libdrawstuff not found.]), $DRAWSTUFF_DEP)
+
+AM_CONDITIONAL([DRAWSTUFF], [test -n "$DRAWSTUFF_LIBS"])
 
 AC_CHECK_LIB(json, json_object_new_object, 
                    JSON_LIBS="-ljson"; AC_SUBST(JSON_LIBS), 
