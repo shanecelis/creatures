@@ -42,6 +42,7 @@ void myexit(int i)
 {
     myprintf("Exiting |\n");
     if (OUTPUTFILE) fflush(OUTPUTFILE);
+    while (1) ;
     exit(i);
 }
 

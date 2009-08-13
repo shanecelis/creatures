@@ -4,6 +4,7 @@
 using namespace alps;
 using namespace std;
 
+static int save_count = 0;
 class Individ_Animat : public Individual {
     public:
     Animat *animat;
@@ -36,6 +37,18 @@ class Individ_Animat : public Individual {
     void make_random() {
         cerr << "random" << endl;
         animat->randGenome();
+        int wrong = 0;
+        int count = 0;
+        do { 
+            animat->mutate();
+            animat->reassignBadConns();
+            animat->checkGenome();
+            animat->checkConnections();
+            
+            wrong = isColliding(animat);
+            count++;
+        } while (wrong && count < 100);
+        //return ! wrong;
     };
     
     void duplicate_settings(Individual *individ2) {        
@@ -88,6 +101,13 @@ class Individ_Animat : public Individual {
 /*     bool make_phenotype(void* arg); */
 /*     bool make_phenotype(); */
 /*     std::istream& read(std::istream& istr); */
-/*    std::ostream& write(std::ostream& ostr); */
+    std::ostream& write(std::ostream& ostr) {
+        cerr << "write" << endl;
+        char filename[255];
+        sprintf(filename, "best-%d.json", save_count);
+        save_count++;
+        animat->save(filename);
+        return ostr;
+    }
 
 };

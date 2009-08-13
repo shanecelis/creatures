@@ -294,13 +294,13 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     // Configuration for a regular EA/GA:
     Number_Layers = 1;
     layer_def.set_select_type(ALPS_SELECT_TOURN);
-    layer_def.set_size(10);//300);
-    layer_def.set_elitism(1);//10);
-    layer_def.set_tourn_size(5);
+    layer_def.set_size(100); //10
+    layer_def.set_elitism(10); //1
+    layer_def.set_tourn_size(10);
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0); // 1.0
     pop->set_print_results_rate(1);//400); // 400
-
+    pop->set_max_gen(30);
   } else if (type == 2) {
     Number_Layers = 5;
     age_gap = 10; //4
@@ -314,7 +314,7 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0);
     pop->set_print_results_rate(1);
-
+    pop->set_max_gen(2);
   } else {
     cerr << "tiny :: setup_pop_gen() - error, invalid EA type: "
 	 << type << "\n";
@@ -325,7 +325,6 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
 			  Number_Layers, layer_def);
   pop->print_layers();
   pop->set_num_runs(1);
-  pop->set_max_gen(2);
 }
 
 void *ea_engine(void *arg1)
@@ -367,6 +366,7 @@ void *ea_engine(void *arg1)
       // Evaluated successfully.
       Population->insert_evaluated(fitness, index, individ, 0);
     }
+    // How do I know when a generation is over?
   }
   // Let's save the best one.
   Individ_Animat* ind = (Individ_Animat*) Population->get_individual(0);
