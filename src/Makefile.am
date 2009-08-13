@@ -1,11 +1,17 @@
-LDFLAGS += $(ODE_LIBS) $(JSON_LIBS) $(DRAWSTUFF_LIBS)
-CPPFLAGS += -DDRAWSTUFF
+LDFLAGS += $(ODE_LIBS) $(JSON_LIBS) 
+if DRAWSTUFF
+#CPPFLAGS += -DDRAWSTUFF
+LDFLAGS += $(DRAWSTUFF_LIBS)
+endif
 
 noinst_LTLIBRARIES = libanimat.la
 libanimat_la_SOURCES = animat.h animat.cpp
 
 LDADD = libanimat.la
-bin_PROGRAMS = ssga grab sphere run readgrab readspheric visual readrun runalps
+bin_PROGRAMS = ssga grab sphere run runalps
+if DRAWSTUFF 
+	bin_PROGRAMS += readgrab readspheric visual readrun
+endif
 run_SOURCES = run.cpp 
 runalps_SOURCES = runalps.cpp  individ_animat.h
 runalps_CPPFLAGS = $(CPPFLAGS) $(ALPS_CFLAGS)
@@ -14,17 +20,18 @@ ssga_SOURCES = ssga.cpp
 grab_SOURCES = grab.cpp 
 sphere_SOURCES = sphere.cpp 
 
+if DRAWSTUFF
 #readbest_SOURCES = readbest.cpp
 #readbest_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readspheric_SOURCES = readspheric.cpp 
-readspheric_LDFLAGS = $(LDFLAGS) 
-visual_SOURCES = visual.cpp 
-visual_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readrun_SOURCES = readrun.cpp 
-readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readgrab_SOURCES = readgrab.cpp 
-readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-
+# readspheric_SOURCES = readspheric.cpp 
+# readspheric_LDFLAGS = $(LDFLAGS) 
+# visual_SOURCES = visual.cpp 
+# visual_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+# readrun_SOURCES = readrun.cpp 
+# readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+# readgrab_SOURCES = readgrab.cpp 
+# readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+endif
 #hello_SOURCES = main.c
 #hello_LDADD = libhello.la
 

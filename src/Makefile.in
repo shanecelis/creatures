@@ -33,9 +33,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+#CPPFLAGS += -DDRAWSTUFF
+@DRAWSTUFF_TRUE@am__append_1 = $(DRAWSTUFF_LIBS)
 bin_PROGRAMS = ssga$(EXEEXT) grab$(EXEEXT) sphere$(EXEEXT) \
-	run$(EXEEXT) readgrab$(EXEEXT) readspheric$(EXEEXT) \
-	visual$(EXEEXT) readrun$(EXEEXT) runalps$(EXEEXT)
+	run$(EXEEXT) runalps$(EXEEXT)
 subdir = src
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
@@ -46,7 +47,9 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_path_generic.m4 \
 	$(top_srcdir)/m4/ax_check_glu.m4 \
 	$(top_srcdir)/m4/ax_check_glut.m4 \
 	$(top_srcdir)/m4/ax_lang_compiler_ms.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -63,27 +66,6 @@ am_grab_OBJECTS = grab.$(OBJEXT)
 grab_OBJECTS = $(am_grab_OBJECTS)
 grab_LDADD = $(LDADD)
 grab_DEPENDENCIES = libanimat.la
-am_readgrab_OBJECTS = readgrab.$(OBJEXT)
-readgrab_OBJECTS = $(am_readgrab_OBJECTS)
-readgrab_LDADD = $(LDADD)
-readgrab_DEPENDENCIES = libanimat.la
-readgrab_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(readgrab_LDFLAGS) $(LDFLAGS) -o $@
-am_readrun_OBJECTS = readrun.$(OBJEXT)
-readrun_OBJECTS = $(am_readrun_OBJECTS)
-readrun_LDADD = $(LDADD)
-readrun_DEPENDENCIES = libanimat.la
-readrun_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(readrun_LDFLAGS) $(LDFLAGS) -o $@
-am_readspheric_OBJECTS = readspheric.$(OBJEXT)
-readspheric_OBJECTS = $(am_readspheric_OBJECTS)
-readspheric_LDADD = $(LDADD)
-readspheric_DEPENDENCIES = libanimat.la
-readspheric_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(readspheric_LDFLAGS) $(LDFLAGS) -o $@
 am_run_OBJECTS = run.$(OBJEXT)
 run_OBJECTS = $(am_run_OBJECTS)
 run_LDADD = $(LDADD)
@@ -103,13 +85,6 @@ am_ssga_OBJECTS = ssga.$(OBJEXT)
 ssga_OBJECTS = $(am_ssga_OBJECTS)
 ssga_LDADD = $(LDADD)
 ssga_DEPENDENCIES = libanimat.la
-am_visual_OBJECTS = visual.$(OBJEXT)
-visual_OBJECTS = $(am_visual_OBJECTS)
-visual_LDADD = $(LDADD)
-visual_DEPENDENCIES = libanimat.la
-visual_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
-	$(visual_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -131,14 +106,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libanimat_la_SOURCES) $(grab_SOURCES) $(readgrab_SOURCES) \
-	$(readrun_SOURCES) $(readspheric_SOURCES) $(run_SOURCES) \
-	$(runalps_SOURCES) $(sphere_SOURCES) $(ssga_SOURCES) \
-	$(visual_SOURCES)
-DIST_SOURCES = $(libanimat_la_SOURCES) $(grab_SOURCES) \
-	$(readgrab_SOURCES) $(readrun_SOURCES) $(readspheric_SOURCES) \
-	$(run_SOURCES) $(runalps_SOURCES) $(sphere_SOURCES) \
-	$(ssga_SOURCES) $(visual_SOURCES)
+SOURCES = $(libanimat_la_SOURCES) $(grab_SOURCES) $(run_SOURCES) \
+	$(runalps_SOURCES) $(sphere_SOURCES) $(ssga_SOURCES)
+DIST_SOURCES = $(libanimat_la_SOURCES) $(grab_SOURCES) $(run_SOURCES) \
+	$(runalps_SOURCES) $(sphere_SOURCES) $(ssga_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -156,7 +127,7 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
-CPPFLAGS = @CPPFLAGS@ -DDRAWSTUFF
+CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -165,14 +136,14 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DRAWSTUFF_LIBS = @DRAWSTUFF_LIBS@
-ECHO = @ECHO@
+DSYMUTIL = @DSYMUTIL@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
-F77 = @F77@
-FFLAGS = @FFLAGS@
+FGREP = @FGREP@
 GLUT_CFLAGS = @GLUT_CFLAGS@
 GLUT_LIBS = @GLUT_LIBS@
 GLU_CFLAGS = @GLU_CFLAGS@
@@ -186,16 +157,23 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JSON_LIBS = @JSON_LIBS@
-LDFLAGS = @LDFLAGS@ $(ODE_LIBS) $(JSON_LIBS) $(DRAWSTUFF_LIBS)
+LD = @LD@
+LDFLAGS = @LDFLAGS@ $(ODE_LIBS) $(JSON_LIBS) $(am__append_1)
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+NM = @NM@
+NMEDIT = @NMEDIT@
+OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 ODE_LIBS = @ODE_LIBS@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -223,7 +201,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 acx_pthread_config = @acx_pthread_config@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
@@ -255,6 +233,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -280,17 +259,6 @@ runalps_LDFLAGS = $(LDFLAGS) $(ALPS_LIBS)
 ssga_SOURCES = ssga.cpp 
 grab_SOURCES = grab.cpp 
 sphere_SOURCES = sphere.cpp 
-
-#readbest_SOURCES = readbest.cpp
-#readbest_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readspheric_SOURCES = readspheric.cpp 
-readspheric_LDFLAGS = $(LDFLAGS) 
-visual_SOURCES = visual.cpp 
-visual_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readrun_SOURCES = readrun.cpp 
-readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
-readgrab_SOURCES = readgrab.cpp 
-readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -384,15 +352,6 @@ clean-binPROGRAMS:
 grab$(EXEEXT): $(grab_OBJECTS) $(grab_DEPENDENCIES) 
 	@rm -f grab$(EXEEXT)
 	$(CXXLINK) $(grab_OBJECTS) $(grab_LDADD) $(LIBS)
-readgrab$(EXEEXT): $(readgrab_OBJECTS) $(readgrab_DEPENDENCIES) 
-	@rm -f readgrab$(EXEEXT)
-	$(readgrab_LINK) $(readgrab_OBJECTS) $(readgrab_LDADD) $(LIBS)
-readrun$(EXEEXT): $(readrun_OBJECTS) $(readrun_DEPENDENCIES) 
-	@rm -f readrun$(EXEEXT)
-	$(readrun_LINK) $(readrun_OBJECTS) $(readrun_LDADD) $(LIBS)
-readspheric$(EXEEXT): $(readspheric_OBJECTS) $(readspheric_DEPENDENCIES) 
-	@rm -f readspheric$(EXEEXT)
-	$(readspheric_LINK) $(readspheric_OBJECTS) $(readspheric_LDADD) $(LIBS)
 run$(EXEEXT): $(run_OBJECTS) $(run_DEPENDENCIES) 
 	@rm -f run$(EXEEXT)
 	$(CXXLINK) $(run_OBJECTS) $(run_LDADD) $(LIBS)
@@ -405,9 +364,6 @@ sphere$(EXEEXT): $(sphere_OBJECTS) $(sphere_DEPENDENCIES)
 ssga$(EXEEXT): $(ssga_OBJECTS) $(ssga_DEPENDENCIES) 
 	@rm -f ssga$(EXEEXT)
 	$(CXXLINK) $(ssga_OBJECTS) $(ssga_LDADD) $(LIBS)
-visual$(EXEEXT): $(visual_OBJECTS) $(visual_DEPENDENCIES) 
-	@rm -f visual$(EXEEXT)
-	$(visual_LINK) $(visual_OBJECTS) $(visual_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -417,14 +373,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/animat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readgrab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readrun.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readspheric.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/run.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runalps-runalps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphere.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssga.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/visual.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -646,7 +598,18 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS
 
+@DRAWSTUFF_TRUE@	bin_PROGRAMS += readgrab readspheric visual readrun
 
+#readbest_SOURCES = readbest.cpp
+#readbest_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+# readspheric_SOURCES = readspheric.cpp 
+# readspheric_LDFLAGS = $(LDFLAGS) 
+# visual_SOURCES = visual.cpp 
+# visual_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+# readrun_SOURCES = readrun.cpp 
+# readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+# readgrab_SOURCES = readgrab.cpp 
+# readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
 #hello_SOURCES = main.c
 #hello_LDADD = libhello.la
 

@@ -278,7 +278,7 @@ bool evaluate_individ(vector<double>& fitness, Individual* individ)
   }
 
   Individ_Animat* ind = (Individ_Animat*) individ;
-  fitness[0] = eval(ind->animat);
+  fitness[0] = 1.0/eval(ind->animat);
   return true;
 }
 
