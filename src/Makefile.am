@@ -1,3 +1,4 @@
+CPPFLAGS += $(ODE_CFLAGS) $(JSON_CFLAGS)
 LDFLAGS += $(ODE_LIBS) $(JSON_LIBS) 
 if DRAWSTUFF
 CPPFLAGS += -DDRAWSTUFF
@@ -5,10 +6,12 @@ LDFLAGS  += $(DRAWSTUFF_LIBS)
 endif
 
 noinst_LTLIBRARIES = libanimat.la
+
 libanimat_la_SOURCES = animat.h animat.cpp
 
-LDADD = libanimat.la
+LDADD = libanimat.la 
 bin_PROGRAMS = ssga grab sphere run runalps
+#bin_PROGRAMS = ssga grab sphere run 
 if DRAWSTUFF 
 bin_PROGRAMS += readgrab readspheric visual readrun
 endif

@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.61])
 AC_INIT([creatures], [0.1], [bug-report@address])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
@@ -19,15 +19,23 @@ AX_CHECK_GL
 AX_CHECK_GLU
 AX_CHECK_GLUT
 
-AC_CHECK_LIB(ode, dWorldSetGravity, 
-                   ODE_LIBS="-lode"; AC_SUBST(ODE_LIBS), 
-                   AC_MSG_ERROR([libode not found.]), )
+PKG_CHECK_MODULES([ODE], [ode])
+AC_SUBST(ODE_CFLAGS)
+AC_SUBST(ODE_LIBS)
+
+PKG_CHECK_MODULES([JSON], [json])
+AC_SUBST(JSON_CFLAGS)
+AC_SUBST(JSON_LIBS)
+dnl AC_CHECK_LIB(ode, dWorldSetGravity, 
+dnl                    ODE_LIBS="-lode"; AC_SUBST(ODE_LIBS), 
+dnl                    AC_MSG_ERROR([libode not found.]), )
 
 OS=`uname -s`
 AC_SUBST(OS)
 case $OS in
      Darwin)
-        DRAWSTUFF_DEP="-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++";
+        #DRAWSTUFF_DEP="-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++";
+        DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS -lstdc++";
         ;;
      Linux)
         DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS";
@@ -44,13 +52,13 @@ AC_CHECK_LIB(drawstuff, dsDrawBoxD,
 
 AM_CONDITIONAL([DRAWSTUFF], [test -n "$DRAWSTUFF_LIBS"])
 
-AC_CHECK_LIB(json, json_object_new_object, 
-                   JSON_LIBS="-ljson"; AC_SUBST(JSON_LIBS), 
-                   AC_MSG_ERROR([libjson not found.]), )
+dnl AC_CHECK_LIB(json, json_object_new_object, 
+dnl                    JSON_LIBS="-ljson"; AC_SUBST(JSON_LIBS), 
+dnl                    AC_MSG_ERROR([libjson not found.]), )
 
 AC_PATH_GENERIC(alps, , , 
-                AC_MSG_ERROR([alps-config not found]), 
-                alps-config, --cflags, --ldflags)
+                 AC_MSG_ERROR([alps-config not found]), 
+                 alps-config, --cflags, --ldflags)
 
 # Checks for header files.
 AC_HEADER_STDC

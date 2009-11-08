@@ -1,0 +1,6 @@
+#!/bin/bash
+# readruns
+
+for file in "$@"; do 
+    ./readrun "$file"
+done
