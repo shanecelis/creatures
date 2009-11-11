@@ -41,20 +41,20 @@ using namespace std;
    5 layers, and a layersize of 60 would work for a Sims-ish run.
 */
 
+//#define TIMEEVAL   8000 // you can get good results with much less (eg 8-9000)
+#define WAITTIME   1000 // Time to leave the body in simulation before, recording anything.
 #define TIMEEVAL   8000 // you can get good results with much less (eg 8-9000)
 #define PRELIMTIME  250
 
-#define LAYERS        5
-#define LAYERSIZE    60
-#define AGEGAP       10
-#define TOURSIZE      9
-#define ELITISM       3
-#define POPSIZE       (LAYERS * LAYERSIZE)
-//#define RECOMBINATION 0.5f
-#define GENERATIONS 100
+// #define LAYERS        5
+// #define LAYERSIZE    60
+// #define AGEGAP       10
+// #define TOURSIZE      9
+// #define ELITISM       3
+// #define POPSIZE       (LAYERS * LAYERSIZE)
+// //#define RECOMBINATION 0.5f
+// #define GENERATIONS 100
 
-Animat pop[POPSIZE];
-Animat tmppop[POPSIZE];
 long int numevals;
 long int timepast, starttime;
 
@@ -183,11 +183,20 @@ double eval(Animat *A)
     double result;
     numevals++;
     resetScene();
-    //myprintf("In Evaluation\n");
+
     //myprintf("Animat A:\n");
     A->generate(0,0,0);
     //A->setImmunityTimer(PRELIMTIME);
     A->pushBehindXVert(0);
+
+    for (nbsteps = 0; nbsteps < WAITTIME; nbsteps++) {
+        try {
+            doWorld(0, STEP, true);
+        } catch (...) {
+            A->remove();
+            return 0.0f;
+        }
+    }
 
     const dReal *pos = dBodyGetPosition(A->limbs[0].id);
     dReal oldPos[3];
@@ -246,32 +255,6 @@ int main2 (int argc, char **argv)
     starttime = (long int) time(NULL);
 
     myprintf("Starting///\n");
-    
-//     FILE *out[LAYERS];
-//     for (int n = 0; n < LAYERS; n++) {
-//         sprintf(tmp, "%s/best-fitness-l%d.data", dir, n);
-//         out[n] = fopen(tmp, "w");
-//     }
-//     for (int i = 0; i < POPSIZE; i++) {
-//         do{
-//             pop[i].randGenome(); 
-//             pop[i].checkGenome();
-//         } while (isColliding(&pop[i]));
-//     }
-//     myprintf("Randomisation over !\n");
-
-//     for (int i = 0; i < GENERATIONS; i++) {
-//         evaluate();
-//         for (int n = 0; n < LAYERS; n++) {
-//             int j = getBest(n);
-//             fprintf(out[n], "%f\n", pop[j].fitness);
-//             fflush(out[n]);
-//             sprintf(tmp, "%s/best-l%d-gen%.3d.dat", dir, n, i);
-//             pop[j].save(tmp);
-//         }
-//         selection(i);
-//     }
-//     fclose(OUTPUTFILE);
     return 0;
 }
 
@@ -292,10 +275,10 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
 {
   pop->set_save_best(true);
   AlpsLayer layer_def;
-  int type = 1; // Set the population type here.
   int age_gap = 5;
   int age_scheme = ALPS_AGING_FIBONACCI1;
   int Number_Layers = -1;
+  int type = 2; // Set the population type here.
   if (type == 1) {
     // Configuration for a regular EA/GA:
     Number_Layers = 1;
@@ -306,7 +289,7 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0); // 1.0
     pop->set_print_results_rate(1);//400); // 400
-    pop->set_max_gen(2);
+    pop->set_max_gen(10);
   } else if (type == 2) {
     Number_Layers = 5;
     age_gap = 10; //4
@@ -320,18 +303,19 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0);
     pop->set_print_results_rate(1);
-    pop->set_max_gen(2);
+    pop->set_max_gen(20);
   } else {
     cerr << "tiny :: setup_pop_gen() - error, invalid EA type: "
 	 << type << "\n";
     return;
   }
 
-  pop->set_maximize();
   pop->config_layers_same(age_scheme, age_gap,
 			  Number_Layers, layer_def);
   pop->print_layers();
   pop->set_num_runs(1);
+  pop->set_maximize();
+
 }
 
 void *ea_engine(void *arg1)

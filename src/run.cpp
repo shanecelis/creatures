@@ -6,6 +6,7 @@
 #include <time.h>
 #include <sys/stat.h>
 #include "animat.h"
+#include <math.h>
 
 /* 
    Sims did a population size of 300 for 100 generations. It took him
@@ -221,6 +222,13 @@ int isColliding(Animat *elim)
     elim->remove();
     NOACTUATE=0;
     return 0;
+}
+
+int max(int a, int b) {
+    if (a > b)
+        return a;
+    else
+        return b;
 }
 
 

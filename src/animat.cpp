@@ -1255,6 +1255,7 @@ void initWorld()
 #endif
     
     // create world
+    dInitODE();
     world = dWorldCreate();
     globalspace = dSimpleSpaceCreate (0); 
     alternatespace = dSimpleSpaceCreate (0);

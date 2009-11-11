@@ -1,7 +1,7 @@
 #include "animat.h"
 
 
-
+#define WAITTIME 1000
 #define TIMEEVAL 10000
 #define PRELIMTIME 1000
 
@@ -17,6 +17,13 @@ dReal newPos[3];
 void simLoop2 (int pause)
 {
     simLoop(pause);
+
+    if (tot_time == WAITTIME) {
+        const dReal *pos = dBodyGetPosition(Ani1.limbs[0].id);
+        oldPos[0] = pos[0];
+        oldPos[1] = pos[1];
+        oldPos[2] = pos[2];
+    }
 
     const dReal *pos = dBodyGetPosition(Ani1.limbs[0].id);
     newPos[0] = pos[0];

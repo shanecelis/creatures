@@ -117,9 +117,10 @@ class Individ_Animat : public Individual {
 /*     bool make_phenotype(); */
 /*     std::istream& read(std::istream& istr); */
     std::ostream& write(std::ostream& ostr) {
-        cerr << "write" << endl;
         char filename[255];
-        sprintf(filename, "best-%d.json", save_count);
+        double fitness = Individual::get_fitness();
+        sprintf(filename, "best-%.3d.json", save_count);
+        cerr << "write individual with fitness " << fitness << " to file " << filename << endl;
         save_count++;
         animat->save(filename);
         return ostr;
