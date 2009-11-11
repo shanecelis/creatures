@@ -123,7 +123,7 @@ int main (int argc, char **argv)
     {
 	nbcycles ++;
 	
-	doWorld(0, STEP, true);
+	doWorld(0, STEP, true, true);
 	for (i=0; i < POPSIZE; i++)
 	    timealive[i] ++;
 	

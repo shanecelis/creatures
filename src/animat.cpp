@@ -1047,7 +1047,7 @@ void nearCallback (void *data, dGeomID o1, dGeomID o2)
     }
 }
 
-void doWorld (int pause, dReal step, int fast)
+void doWorld (int pause, dReal step, int fast, int useBrains)
 {
 
     // perform a cycle of the simulation.
@@ -1105,8 +1105,10 @@ void doWorld (int pause, dReal step, int fast)
                 }
 
                 // perform a neural update cycle
-                if (regist[i]->alive) 
-                    regist[i]->actuate();
+                if (regist[i]->alive) {
+                    if (useBrains)
+                        regist[i]->actuate();
+                } 
                 else 
                 { 
                     mydie(
@@ -1142,6 +1144,11 @@ void drawSlant()
 #ifdef DRAWSTUFF
 void simLoop (int pause)
 {
+    simLoopPlus(pause, true);
+}
+
+void simLoopPlus (int pause, int useBrains)
+{
 
     // this is the loop function to be called when performing graphical
     // simulations (see readbest.cpp and visual.cpp for examples)
@@ -1175,7 +1182,7 @@ void simLoop (int pause)
     if (WALLS) drawWalls();
     if (CORRIDOR) drawCorridor();
     if (BALL)  ball.draw();
-    doWorld(pause, STEP, true);
+    doWorld(pause, STEP, true, useBrains);
 }
 #endif
 

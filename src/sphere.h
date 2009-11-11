@@ -187,7 +187,7 @@ int isColliding(Animat *elim)
 	return 1;
     }
     myprintf("Doing world...\n ");
-    doWorld(0, STEP, true);
+    doWorld(0, STEP, true, true);
     myprintf("world done.\n");
     if (elim->test_for_intra_coll()) 
     {

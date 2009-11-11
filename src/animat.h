@@ -2976,12 +2976,13 @@ public:
 
 
 
-void doWorld (int pause, dReal step, int fast);
+void doWorld (int pause, dReal step, int fast, int useBrains);
 void resetScene();
 void initWorld();
 void destroyWorld();
 #ifdef DRAWSTUFF
 void simLoop (int pause);
+void simLoopPlus (int pause, int useBrains);
 #endif
 
 #endif /* _ANIMAT_H_ */

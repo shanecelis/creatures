@@ -84,7 +84,7 @@ int isColliding(Animat *elim)
             elim->remove();
             return 1;
         }
-    doWorld(0, STEP, true);
+    doWorld(0, STEP, true, true);
     if (elim->test_for_intra_coll()) 
         {
             myprintf("Self-Collided - 2nd pass!\n");
@@ -191,7 +191,7 @@ double eval(Animat *A)
 
     for (nbsteps = 0; nbsteps < WAITTIME; nbsteps++) {
         try {
-            doWorld(0, STEP, true);
+            doWorld(0, STEP, true, true);
         } catch (...) {
             A->remove();
             return 0.0f;
@@ -206,7 +206,7 @@ double eval(Animat *A)
 
     for (nbsteps = 0; nbsteps < TIMEEVAL; nbsteps++) {
         try {
-            doWorld(0, STEP, true);
+            doWorld(0, STEP, true, true);
         } catch (...) {
             A->remove();
             return 0.0f;
