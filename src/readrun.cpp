@@ -107,12 +107,6 @@ int main (int argc, char **argv)
     Ani1.setImmunityTimer(PRELIMTIME);
     Ani1.displayRepres();
 	Ani1.pushBehindXVert(0);
-
-    const dReal *pos = dBodyGetPosition(Ani1.limbs[0].id);
-    oldPos[0] = pos[0];
-    oldPos[1] = pos[1];
-    oldPos[2] = pos[2];
-
     
     printf("OK\n");
     dsSimulationLoop (argc,argv,352,288,&fn);

@@ -32,11 +32,11 @@ using namespace std;
    three hours on a connection machine.  What would that be for an
    ALPS approach?
 
-   10
-   20
-   40
-   80
-   160
+   10    5
+   20    10
+   40    20
+   80    40
+   160   80
 
    5 layers, and a layersize of 60 would work for a Sims-ish run.
 */
@@ -176,6 +176,13 @@ void replace(Animat *elim, Animat *A, Animat *B)
     elim->age = max(A->age, B->age) + 1;
 }
 
+dReal epsilon = 0.0001;
+
+dReal norm2sq(const dReal *a)
+{
+    return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+}
+
 double eval(Animat *A)
 {
     //cerr << "begin eval" << endl;
@@ -191,7 +198,15 @@ double eval(Animat *A)
 
     for (nbsteps = 0; nbsteps < WAITTIME; nbsteps++) {
         try {
-            doWorld(0, STEP, true, true);
+            doWorld(0, STEP, true, false);
+            const dReal *vel = dBodyGetLinearVel(A->limbs[0].id);
+            const dReal *angvel = dBodyGetAngularVel(A->limbs[0].id);
+            dReal velsq = norm2sq(vel);
+            dReal angvelsq = norm2sq(angvel);
+            //myprintf("\nvelsq: %f angvelsq: %f", velsq, angvelsq);
+            if (velsq < epsilon && angvelsq < epsilon) {
+                break;
+            }
         } catch (...) {
             A->remove();
             return 0.0f;
@@ -292,8 +307,8 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     pop->set_max_gen(10);
   } else if (type == 2) {
     Number_Layers = 5;
-    age_gap = 10; //4
-    age_scheme = ALPS_AGING_EXP3;
+    age_gap = 5; //4
+    age_scheme = ALPS_AGING_EXP;
     layer_def.set_select_type(ALPS_SELECT_TOURN);
     //    layer_def.set_select_type(ALPS_SELECT_DC);
     layer_def.set_size(60);
@@ -303,7 +318,7 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0);
     pop->set_print_results_rate(1);
-    pop->set_max_gen(20);
+    pop->set_max_gen(100);
   } else {
     cerr << "tiny :: setup_pop_gen() - error, invalid EA type: "
 	 << type << "\n";
