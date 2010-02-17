@@ -12,7 +12,7 @@
 //int SENSORTYPES[NBSENSORTYPES] = {SENSBALLX, SENSBALLY, SENSCLOSESTANIMX,
 //                                SENSCLOSESTANIMY, SENSTOUCH, SENSUPDOWN, SENSLEFTRIGHT };
 
-int SENSORTYPES[NBSENSORTYPES] = { SENSUPDOWN, SENSLEFTRIGHT };
+int SENSORTYPES[NBSENSORTYPES] = { SENSGOSTOP };
 
 // UNCOMMENT THIS (and comment out the previous passage) IF YOU WON'T USE THE
 // BALL/BOX IN YOUR SIMULATIONS
@@ -37,7 +37,13 @@ dWorldID world;
 dMatrix3 IDENTITY;
 dSpaceID globalspace;
 dSpaceID alternatespace; // only used within collision method
-double upDown = 0.0f;
+
+/*
+  upDown and leftRight are global variables that describe how the
+  creature is supposed to be moving.
+ */
+double goStop = 0.0f; 
+double upDown = 0.0f; 
 double leftRight = 0.0f;
 
 //  Still an awful lot of global variables !
@@ -632,6 +638,13 @@ void Animat::fillSensors()
                     repres[i].neurons[neur].out = 0;
                 //myprintf("%.6f\n", repres[i].neurons[neur].out);
             }
+            if (repres[i].neurons[neur].type == SENSGOSTOP)
+            {
+                repres[i].neurons[neur].out = goStop;
+                if (DISABLESENSORS)
+                    repres[i].neurons[neur].out = 0;
+                //myprintf("go stop neuron %.6f\n", repres[i].neurons[neur].out);
+            }
             if (repres[i].neurons[neur].type == SENSUPDOWN)
             {
                 repres[i].neurons[neur].out = upDown;
@@ -1106,8 +1119,13 @@ void doWorld (int pause, dReal step, int fast, int useBrains)
 
                 // perform a neural update cycle
                 if (regist[i]->alive) {
-                    if (useBrains)
+                    if (useBrains) {
                         regist[i]->actuate();
+                    } else {
+                        for (int j = 1; j < regist[i]->nblimbs(); j++) {
+                            dJointSetHingeParam(regist[i]->limbs[j].joint, dParamFMax, 0);
+                        }
+                    }
                 } 
                 else 
                 { 

@@ -9,7 +9,7 @@ class Individ_Animat : public Individual {
     public:
     Animat *animat;
     Individ_Animat() {
-        cerr << "constructed" << endl;
+        //cerr << "constructed" << endl;
         animat = NULL;
     };
     virtual ~Individ_Animat() {
@@ -19,7 +19,7 @@ class Individ_Animat : public Individual {
         }
     };
     void initialize() {
-        cerr << "initialize" << endl;
+        //cerr << "initialize" << endl;
         Individual::initialize();
         animat = new Animat();
     };
@@ -42,7 +42,7 @@ class Individ_Animat : public Individual {
     }
     
     void make_random() {
-        cerr << "random" << endl;
+        //cerr << "random" << endl;
         Individual::make_random();
         animat->randGenome();
         int wrong = 0;
@@ -65,7 +65,7 @@ class Individ_Animat : public Individual {
     };
 
     void duplicate(Individual *ind) {
-        cerr << "duplicate" << endl;
+        //cerr << "duplicate" << endl;
         duplicate_settings(ind);
         Individual::duplicate(ind);
         Individ_Animat* other = (Individ_Animat *) ind;
@@ -73,7 +73,7 @@ class Individ_Animat : public Individual {
     };
     
     bool mutate() {
-        cerr << "mutate" << endl;
+        //cerr << "mutate" << endl;
         Individual::mutate();
         int wrong = 0;
         int count = 0;
@@ -90,7 +90,7 @@ class Individ_Animat : public Individual {
     };
     
     bool recombine(Individual *ind) {
-        cerr << "recombine" << endl;
+        //cerr << "recombine" << endl;
         Individual::recombine(ind);
         Individ_Animat* other = (Individ_Animat *) ind;
         int wrong = 0;

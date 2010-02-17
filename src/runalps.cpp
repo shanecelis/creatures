@@ -58,6 +58,12 @@ using namespace std;
 long int numevals;
 long int timepast, starttime;
 
+int fitness_type = 0;
+#define RUN 0
+#define GOSTOP 1
+#define UPDOWN 2
+#define FOURWAY 3
+
 void replace(Animat *elim, Animat *A, Animat *B);
 double eval (Animat *A);
 
@@ -183,7 +189,8 @@ dReal norm2sq(const dReal *a)
     return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
 }
 
-double eval(Animat *A)
+
+double prim_eval(Animat *A)
 {
     //cerr << "begin eval" << endl;
     int nbsteps;
@@ -213,7 +220,8 @@ double eval(Animat *A)
         }
     }
 
-    const dReal *pos = dBodyGetPosition(A->limbs[0].id);
+    //const dReal *pos = dBodyGetPosition(A->limbs[0].id);
+    const dReal *pos = A->getAvgPos();
     dReal oldPos[3];
     oldPos[0] = pos[0];
     oldPos[1] = pos[1];
@@ -228,7 +236,8 @@ double eval(Animat *A)
         }
     }
     
-    pos = dBodyGetPosition(A->limbs[0].id);
+    //pos = dBodyGetPosition(A->limbs[0].id);
+    pos = A->getAvgPos();
     dReal newPos[3];
     newPos[0] = pos[0];
     newPos[1] = pos[1];
@@ -240,10 +249,28 @@ double eval(Animat *A)
         result += (oldPos[i] - newPos[i]) * (oldPos[i] - newPos[i]);
     }
     myprintf("Eval: %f\n", result);
-    //cerr << "end eval" << endl;
     return result; 
     //return result; // in [-1; 1]; the higer, the better for A (worse for B)
 }
+
+double eval(Animat *A) 
+{
+    double a, b;
+    switch(fitness_type) {
+    case RUN:
+        return prim_eval(A);
+    case GOSTOP:
+        goStop = 1.0;
+        a = prim_eval(A);
+        goStop = 0.0;
+        b = prim_eval(A);
+        return a/((b + 1.0)*(b + 1.0));
+    default:
+        myprintf("no fitness_type %d\n", fitness_type);
+        abort();
+    }
+}
+
 
 int my_mkdir(char* name) {
     return mkdir(name, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -256,6 +283,7 @@ int main2 (int argc, char **argv)
         fprintf(stderr, "run <result-dir>\n");
         return 2;
     }
+    //OUTPUTREDIRECT = TOSTDOUT; // uncomment this to print output to stdout
     //OUTPUTREDIRECT = TOSTDOUT; // uncomment this to print output to stdout
     WORLDTYPE = FLATWORLD;  // let's go all presocratic here...
     int err = my_mkdir(argv[1]);
@@ -298,21 +326,21 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
     // Configuration for a regular EA/GA:
     Number_Layers = 1;
     layer_def.set_select_type(ALPS_SELECT_TOURN);
-    layer_def.set_size(10); //100
+    layer_def.set_size(20); //100
     layer_def.set_elitism(1); //10
-    layer_def.set_tourn_size(5);
+    layer_def.set_tourn_size(3);
     pop->set_recomb_prob(0.5);
     pop->set_rec_rand2_prob(1.0); // 1.0
     pop->set_print_results_rate(1);//400); // 400
-    pop->set_max_gen(10);
+    pop->set_max_gen(20);
   } else if (type == 2) {
     Number_Layers = 5;
     age_gap = 5; //4
     age_scheme = ALPS_AGING_EXP;
     layer_def.set_select_type(ALPS_SELECT_TOURN);
     //    layer_def.set_select_type(ALPS_SELECT_DC);
-    layer_def.set_size(60);
-    layer_def.set_elitism(3);
+    layer_def.set_size(40);
+    layer_def.set_elitism(1);
     layer_def.set_tourn_size(9);
     layer_def.set_prob_select_prev(0.2);
     pop->set_recomb_prob(0.5);
@@ -381,9 +409,48 @@ void *ea_engine(void *arg1)
   return 0;
 }
 
+void usage() {
+    fprintf(stderr, "usage: runalps [-h] [-f type]\n");
+    fprintf(stderr, "      -f fitness type \n");
+    fprintf(stderr, "         0. run/go\n");
+    fprintf(stderr, "         1. go stop\n");
+    fprintf(stderr, "         2. up down\n");
+    fprintf(stderr, "         3. four way\n");
+}
+
 int main(int argc, char **argv) {
 
+    int c;
+    
+    opterr = 0;
+    
+    while ((c = getopt (argc, argv, "hf:")) != -1)
+        switch (c)
+            {
+            case 'h':
+                usage();
+                return 2;
+            case 'f':
+                fitness_type = atoi(optarg);
+                break;
+                
+            case '?':
+                if (optopt == 'f')
+                    fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+                else if (isprint (optopt))
+                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+                else
+                    fprintf (stderr,
+                             "Unknown option character `\\x%x'.\n",
+                             optopt);
+                return 1;
+            default:
+                abort();
+            }
+    
+    printf("fitness_type = %d\n", fitness_type);
     WORLDTYPE = FLATWORLD;  // let's go all presocratic here...
+    OUTPUTREDIRECT = TONULL;
     initWorld();
     starttime = (long int) time(NULL);
     

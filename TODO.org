@@ -2,3 +2,6 @@
 * TODO Change eval to be directional
 * TODO Update readrun to set the directional neurons 
   for the buttons up, down, left, right
+  
+  #define SENSUPDOWN 9
+#define SENSLEFTRIGHT 10

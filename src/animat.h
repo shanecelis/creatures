@@ -98,8 +98,9 @@ void myexit(int i);
 #define SENSCLOSESTANIMX 6
 #define SENSTOUCH 7
 #define SENSDAMAGE 8
-#define SENSUPDOWN 9
-#define SENSLEFTRIGHT 10
+#define SENSGOSTOP 9
+#define SENSUPDOWN 10
+#define SENSLEFTRIGHT 11
 
 
 #define REFBOTH 44
@@ -117,7 +118,9 @@ void myexit(int i);
 // forces limb 0 to possess a SENSCLOSESTANIMX and SENSCLOSESTANIMY sensor.
 #define ENFORCESENSORSINTRUNK 0
 
-#define NBSENSORTYPES 2
+#define NBSENSORTYPES 1
+
+
 void airCallback(void *data, dGeomID o1, dGeomID o2);
 void nearCallback(void *data, dGeomID o1, dGeomID o2);
 
@@ -138,6 +141,7 @@ extern dWorldID world;
 extern dMatrix3 IDENTITY;
 extern dSpaceID globalspace;
 extern dSpaceID alternatespace; // only used within collision method
+extern double goStop;
 extern double upDown;
 extern double leftRight;
 
@@ -2769,6 +2773,26 @@ public:
 
     void generate(dReal nx, dReal ny, dReal alpha);
     void remove();
+
+    dReal* getAvgPos()
+    {
+        int n = 0;
+        static dReal ravg[3];
+        dReal *r;
+        for (int i=0; i < MAXLIMBS; i++)
+            if (limbs[i].id)
+            {    
+                r = (dReal *)dBodyGetPosition(limbs[i].id);
+                ravg[0] += r[0];
+                ravg[1] += r[1];
+                ravg[2] += r[2];
+                n++;
+            }
+        ravg[0] /= (double) n;
+        ravg[1] /= (double) n;
+        ravg[2] /= (double) n;
+        return ravg;
+    }
     
     void setPos(dReal nx, dReal ny)
     {
