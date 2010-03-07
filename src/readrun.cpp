@@ -95,10 +95,22 @@ void keypressed(int cmd)
 {
     switch (cmd) {
     case 'w':
-        myprintf("\nup\n");
+        if (upDown == 1.0) {
+            myprintf("\nstop\n");
+            upDown == 0.0;
+        } else {
+            upDown = 1.0;
+            myprintf("\nup\n");
+        }
         break;
     case 's':
-        myprintf("\ndown\n");
+        if (upDown == -1.0) {
+            myprintf("\nstop\n");
+            upDown == 0.0;
+        } else {
+            upDown = -1.0;
+            myprintf("\ndown\n");
+        }
         break;
     case 'a':
         myprintf("\nleft\n");
@@ -133,6 +145,7 @@ void initScene2()
     fn.step = &simLoop2;
     fn.command = &keypressed;
     goStop = 1.0;
+    upDown = 0.0;
 }
 
 void usage()

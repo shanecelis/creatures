@@ -184,17 +184,21 @@ void replace(Animat *elim, Animat *A, Animat *B)
 
 dReal epsilon = 0.0001;
 
-dReal norm2sq(const dReal *a)
+dReal norm2sq(dReal *a)
 {
     return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
 }
 
+dReal norm2(dReal *a)
+{
+    return sqrt(norm2sq(a));
+}
 
-double prim_eval(Animat *A)
+
+int prim_eval_v(Animat *A, dReal* result)
 {
     //cerr << "begin eval" << endl;
     int nbsteps;
-    double result;
     numevals++;
     resetScene();
 
@@ -208,8 +212,8 @@ double prim_eval(Animat *A)
             doWorld(0, STEP, true, false);
             const dReal *vel = dBodyGetLinearVel(A->limbs[0].id);
             const dReal *angvel = dBodyGetAngularVel(A->limbs[0].id);
-            dReal velsq = norm2sq(vel);
-            dReal angvelsq = norm2sq(angvel);
+            dReal velsq = norm2sq((dReal*) vel);
+            dReal angvelsq = norm2sq((dReal*) angvel);
             //myprintf("\nvelsq: %f angvelsq: %f", velsq, angvelsq);
             if (velsq < epsilon && angvelsq < epsilon) {
                 break;
@@ -244,18 +248,29 @@ double prim_eval(Animat *A)
     newPos[2] = pos[2];
 
     A->remove();
-    result = 0.0f;
-    for (int i = 0; i < 3; i++) {
-        result += (oldPos[i] - newPos[i]) * (oldPos[i] - newPos[i]);
-    }
-    myprintf("Eval: %f\n", result);
-    return result; 
+
+    result[0] = newPos[0] - oldPos[0];
+    result[1] = newPos[1] - oldPos[1];
+    result[2] = newPos[2] - oldPos[2];
+    myprintf("Eval: {%f, %f, %f}\n", result[0], result[1], result[2]);
+    
+    return 0;
     //return result; // in [-1; 1]; the higer, the better for A (worse for B)
+}
+
+double prim_eval(Animat *A)
+{
+    dReal r[3];
+    prim_eval_v(A, r);
+    double d = norm2(r);
+    myprintf("Eval: %f\n", d);
+    return d;
 }
 
 double eval(Animat *A) 
 {
     double a, b;
+    
     switch(fitness_type) {
     case RUN:
         return prim_eval(A);
@@ -265,11 +280,62 @@ double eval(Animat *A)
         goStop = 0.0;
         b = prim_eval(A);
         return a/((b + 1.0)*(b + 1.0));
+    case UPDOWN:
+        double eval_updown(Animat *A);
+        return eval_updown(A);
     default:
         myprintf("no fitness_type %d\n", fitness_type);
         abort();
     }
 }
+// u = R(a) v 
+// Rotate v by the axis (0,0,1) by the angle a to produce vector u.
+void rotate(dReal *u, double a, dReal *v)
+{
+    double cosa, sina;
+    cosa = cos(a);
+    sina = sin(a);
+    u[0] = cosa * v[0] - sina * v[1];
+    u[1] = sina * v[0] + cosa * v[1];
+    u[2] = v[2];
+}
+
+double eval_updown(Animat *A) 
+{
+    dReal rup[3], rdown[3], rstop[3];
+    upDown = 1.0;
+    myprintf("Up ");
+    prim_eval_v(A, rup);
+    upDown = -1.0;              // Not sure if the neurons are [1,-1] or [1,0].
+    myprintf("Down ");
+    prim_eval_v(A, rdown);
+    upDown = 0.0;
+    myprintf("Stop ");
+    prim_eval_v(A, rstop);
+    
+    // Let's project everything into the x-y plane at z = 0.
+    rup[2] = rdown[2] = rstop[2] = 0.0;
+
+    // Let a be the angle between rup and y positive, (0,1,0).  
+    double a = acos(rup[1]/norm2(rup));
+    dReal rupn[3], rdownn[3];
+
+    rotate(rupn, a, rup);
+    rotate(rdownn, a, rdown);
+    
+
+    double fitness = fabs(rupn[1])/(1.0 
+                                    + fabs(rupn[0]) + fabs(rdownn[0]) 
+                                    + norm2(rstop));
+    if (rdownn[1] > 0.0) {
+        fitness *= fabs(rdownn[1]);
+    } else {
+        fitness /= (1.0 + fabs(rdownn[1]));
+    }
+    myprintf("Eval_updown: %f\n", fitness);
+    return fitness;
+}
+
 
 
 int my_mkdir(char* name) {
@@ -450,7 +516,7 @@ int main(int argc, char **argv) {
     
     printf("fitness_type = %d\n", fitness_type);
     WORLDTYPE = FLATWORLD;  // let's go all presocratic here...
-    OUTPUTREDIRECT = TONULL;
+    //OUTPUTREDIRECT = TONULL;
     initWorld();
     starttime = (long int) time(NULL);
     
