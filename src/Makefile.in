@@ -38,7 +38,8 @@ host_triplet = @host@
 @DRAWSTUFF_TRUE@am__append_1 = -DDRAWSTUFF
 @DRAWSTUFF_TRUE@am__append_2 = $(DRAWSTUFF_LIBS)
 bin_PROGRAMS = ssga$(EXEEXT) grab$(EXEEXT) sphere$(EXEEXT) \
-	run$(EXEEXT) runalps$(EXEEXT) $(am__EXEEXT_1)
+	run$(EXEEXT) runalps$(EXEEXT) animatga$(EXEEXT) eval$(EXEEXT) \
+	$(am__EXEEXT_1)
 #bin_PROGRAMS = ssga grab sphere run 
 @DRAWSTUFF_TRUE@am__append_3 = readgrab readspheric visual readrun
 subdir = src
@@ -62,12 +63,26 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libanimat_la_LIBADD =
-am_libanimat_la_OBJECTS = animat.lo
+am_libanimat_la_OBJECTS = animat.lo animat_eval.lo
 libanimat_la_OBJECTS = $(am_libanimat_la_OBJECTS)
 @DRAWSTUFF_TRUE@am__EXEEXT_1 = readgrab$(EXEEXT) readspheric$(EXEEXT) \
 @DRAWSTUFF_TRUE@	visual$(EXEEXT) readrun$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am_animatga_OBJECTS = animatga-animatga.$(OBJEXT)
+animatga_OBJECTS = $(am_animatga_OBJECTS)
+animatga_LDADD = $(LDADD)
+animatga_DEPENDENCIES = libanimat.la
+animatga_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(animatga_LDFLAGS) $(LDFLAGS) -o $@
+am_eval_OBJECTS = eval.$(OBJEXT)
+eval_OBJECTS = $(am_eval_OBJECTS)
+eval_LDADD = $(LDADD)
+eval_DEPENDENCIES = libanimat.la
+eval_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(eval_LDFLAGS) $(LDFLAGS) -o $@
 am_grab_OBJECTS = grab.$(OBJEXT)
 grab_OBJECTS = $(am_grab_OBJECTS)
 grab_LDADD = $(LDADD)
@@ -145,15 +160,15 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libanimat_la_SOURCES) $(grab_SOURCES) $(readgrab_SOURCES) \
-	$(readrun_SOURCES) $(readspheric_SOURCES) $(run_SOURCES) \
-	$(runalps_SOURCES) $(sphere_SOURCES) $(ssga_SOURCES) \
-	$(visual_SOURCES)
-DIST_SOURCES = $(libanimat_la_SOURCES) $(grab_SOURCES) \
-	$(am__readgrab_SOURCES_DIST) $(am__readrun_SOURCES_DIST) \
-	$(am__readspheric_SOURCES_DIST) $(run_SOURCES) \
-	$(runalps_SOURCES) $(sphere_SOURCES) $(ssga_SOURCES) \
-	$(am__visual_SOURCES_DIST)
+SOURCES = $(libanimat_la_SOURCES) $(animatga_SOURCES) $(eval_SOURCES) \
+	$(grab_SOURCES) $(readgrab_SOURCES) $(readrun_SOURCES) \
+	$(readspheric_SOURCES) $(run_SOURCES) $(runalps_SOURCES) \
+	$(sphere_SOURCES) $(ssga_SOURCES) $(visual_SOURCES)
+DIST_SOURCES = $(libanimat_la_SOURCES) $(animatga_SOURCES) \
+	$(eval_SOURCES) $(grab_SOURCES) $(am__readgrab_SOURCES_DIST) \
+	$(am__readrun_SOURCES_DIST) $(am__readspheric_SOURCES_DIST) \
+	$(run_SOURCES) $(runalps_SOURCES) $(sphere_SOURCES) \
+	$(ssga_SOURCES) $(am__visual_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -299,15 +314,20 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libanimat.la
-libanimat_la_SOURCES = animat.h animat.cpp
+libanimat_la_SOURCES = animat.h animat.cpp animat_eval.cpp animat_eval.h AnimatGenome.h 
 LDADD = libanimat.la 
 run_SOURCES = run.cpp 
+animatga_SOURCES = animatga.cpp 
+animatga_CPPFLAGS = $(CPPFLAGS) 
+animatga_LDFLAGS = $(LDFLAGS) -lga
 runalps_SOURCES = runalps.cpp  individ_animat.h
 runalps_CPPFLAGS = $(CPPFLAGS) $(ALPS_CFLAGS)
 runalps_LDFLAGS = $(LDFLAGS) $(ALPS_LIBS)
 ssga_SOURCES = ssga.cpp 
 grab_SOURCES = grab.cpp 
 sphere_SOURCES = sphere.cpp 
+eval_SOURCES = eval.cpp 
+eval_LDFLAGS = $(LDFLAGS) -lga
 @DRAWSTUFF_TRUE@readspheric_SOURCES = readspheric.cpp 
 @DRAWSTUFF_TRUE@readspheric_LDFLAGS = $(LDFLAGS) 
 @DRAWSTUFF_TRUE@visual_SOURCES = visual.cpp 
@@ -422,6 +442,12 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+animatga$(EXEEXT): $(animatga_OBJECTS) $(animatga_DEPENDENCIES) 
+	@rm -f animatga$(EXEEXT)
+	$(animatga_LINK) $(animatga_OBJECTS) $(animatga_LDADD) $(LIBS)
+eval$(EXEEXT): $(eval_OBJECTS) $(eval_DEPENDENCIES) 
+	@rm -f eval$(EXEEXT)
+	$(eval_LINK) $(eval_OBJECTS) $(eval_LDADD) $(LIBS)
 grab$(EXEEXT): $(grab_OBJECTS) $(grab_DEPENDENCIES) 
 	@rm -f grab$(EXEEXT)
 	$(CXXLINK) $(grab_OBJECTS) $(grab_LDADD) $(LIBS)
@@ -457,6 +483,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/animat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/animat_eval.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/animatga-animatga.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eval.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readgrab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readrun.Po@am__quote@
@@ -487,6 +516,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+animatga-animatga.o: animatga.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(animatga_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT animatga-animatga.o -MD -MP -MF $(DEPDIR)/animatga-animatga.Tpo -c -o animatga-animatga.o `test -f 'animatga.cpp' || echo '$(srcdir)/'`animatga.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/animatga-animatga.Tpo $(DEPDIR)/animatga-animatga.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='animatga.cpp' object='animatga-animatga.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(animatga_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o animatga-animatga.o `test -f 'animatga.cpp' || echo '$(srcdir)/'`animatga.cpp
+
+animatga-animatga.obj: animatga.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(animatga_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT animatga-animatga.obj -MD -MP -MF $(DEPDIR)/animatga-animatga.Tpo -c -o animatga-animatga.obj `if test -f 'animatga.cpp'; then $(CYGPATH_W) 'animatga.cpp'; else $(CYGPATH_W) '$(srcdir)/animatga.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/animatga-animatga.Tpo $(DEPDIR)/animatga-animatga.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='animatga.cpp' object='animatga-animatga.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(animatga_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o animatga-animatga.obj `if test -f 'animatga.cpp'; then $(CYGPATH_W) 'animatga.cpp'; else $(CYGPATH_W) '$(srcdir)/animatga.cpp'; fi`
 
 runalps-runalps.o: runalps.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(runalps_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT runalps-runalps.o -MD -MP -MF $(DEPDIR)/runalps-runalps.Tpo -c -o runalps-runalps.o `test -f 'runalps.cpp' || echo '$(srcdir)/'`runalps.cpp

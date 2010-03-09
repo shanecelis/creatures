@@ -15,6 +15,7 @@ int isColliding(Animat *elim);
 // #include "animat.h"
 //#include "individ_animat.h"
 #include "individ_animat.cpp"
+#include "animat_eval.h"
 
 #include "alps.h"
 #include "alps_gen.h"
@@ -41,10 +42,6 @@ using namespace std;
    5 layers, and a layersize of 60 would work for a Sims-ish run.
 */
 
-//#define TIMEEVAL   8000 // you can get good results with much less (eg 8-9000)
-#define WAITTIME   1000 // Time to leave the body in simulation before, recording anything.
-#define TIMEEVAL   8000 // you can get good results with much less (eg 8-9000)
-#define PRELIMTIME  250
 
 // #define LAYERS        5
 // #define LAYERSIZE    60
@@ -72,35 +69,6 @@ double randf(double start, double end)
     return ((rand() % 10000) * (end - start))/10000 + start;
 }
 
-
-// tests for internal collisions
-int isColliding(Animat *elim)
-{
-    NOACTUATE = 1;
-    elim->generate(-50,0,0);
-    if (elim->nblimbs() >= MAXLIMBS) 
-        {
-            myprintf("Too big !\n");
-            elim->remove();
-            return 1;
-        }
-    if (elim->test_for_intra_coll()) 
-        {
-            myprintf("Self-Collided - 1st pass!\n");
-            elim->remove();
-            return 1;
-        }
-    doWorld(0, STEP, true, true);
-    if (elim->test_for_intra_coll()) 
-        {
-            myprintf("Self-Collided - 2nd pass!\n");
-            elim->remove();
-            return 1;
-        }
-    elim->remove();
-    NOACTUATE=0;
-    return 0;
-}
 
 
 // replaces elim's genome with either a recombination between A and B, or a
@@ -182,161 +150,6 @@ void replace(Animat *elim, Animat *A, Animat *B)
     elim->age = max(A->age, B->age) + 1;
 }
 
-dReal epsilon = 0.0001;
-
-dReal norm2sq(dReal *a)
-{
-    return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
-}
-
-dReal norm2(dReal *a)
-{
-    return sqrt(norm2sq(a));
-}
-
-
-int prim_eval_v(Animat *A, dReal* result)
-{
-    //cerr << "begin eval" << endl;
-    int nbsteps;
-    numevals++;
-    resetScene();
-
-    //myprintf("Animat A:\n");
-    A->generate(0,0,0);
-    //A->setImmunityTimer(PRELIMTIME);
-    A->pushBehindXVert(0);
-
-    for (nbsteps = 0; nbsteps < WAITTIME; nbsteps++) {
-        try {
-            doWorld(0, STEP, true, false);
-            const dReal *vel = dBodyGetLinearVel(A->limbs[0].id);
-            const dReal *angvel = dBodyGetAngularVel(A->limbs[0].id);
-            dReal velsq = norm2sq((dReal*) vel);
-            dReal angvelsq = norm2sq((dReal*) angvel);
-            //myprintf("\nvelsq: %f angvelsq: %f", velsq, angvelsq);
-            if (velsq < epsilon && angvelsq < epsilon) {
-                break;
-            }
-        } catch (...) {
-            A->remove();
-            return 0.0f;
-        }
-    }
-
-    //const dReal *pos = dBodyGetPosition(A->limbs[0].id);
-    const dReal *pos = A->getAvgPos();
-    dReal oldPos[3];
-    oldPos[0] = pos[0];
-    oldPos[1] = pos[1];
-    oldPos[2] = pos[2];
-
-    for (nbsteps = 0; nbsteps < TIMEEVAL; nbsteps++) {
-        try {
-            doWorld(0, STEP, true, true);
-        } catch (...) {
-            A->remove();
-            return 0.0f;
-        }
-    }
-    
-    //pos = dBodyGetPosition(A->limbs[0].id);
-    pos = A->getAvgPos();
-    dReal newPos[3];
-    newPos[0] = pos[0];
-    newPos[1] = pos[1];
-    newPos[2] = pos[2];
-
-    A->remove();
-
-    result[0] = newPos[0] - oldPos[0];
-    result[1] = newPos[1] - oldPos[1];
-    result[2] = newPos[2] - oldPos[2];
-    myprintf("Eval: {%f, %f, %f}\n", result[0], result[1], result[2]);
-    
-    return 0;
-    //return result; // in [-1; 1]; the higer, the better for A (worse for B)
-}
-
-double prim_eval(Animat *A)
-{
-    dReal r[3];
-    prim_eval_v(A, r);
-    double d = norm2(r);
-    myprintf("Eval: %f\n", d);
-    return d;
-}
-
-double eval(Animat *A) 
-{
-    double a, b;
-    
-    switch(fitness_type) {
-    case RUN:
-        return prim_eval(A);
-    case GOSTOP:
-        goStop = 1.0;
-        a = prim_eval(A);
-        goStop = 0.0;
-        b = prim_eval(A);
-        return a/((b + 1.0)*(b + 1.0));
-    case UPDOWN:
-        double eval_updown(Animat *A);
-        return eval_updown(A);
-    default:
-        myprintf("no fitness_type %d\n", fitness_type);
-        abort();
-    }
-}
-// u = R(a) v 
-// Rotate v by the axis (0,0,1) by the angle a to produce vector u.
-void rotate(dReal *u, double a, dReal *v)
-{
-    double cosa, sina;
-    cosa = cos(a);
-    sina = sin(a);
-    u[0] = cosa * v[0] - sina * v[1];
-    u[1] = sina * v[0] + cosa * v[1];
-    u[2] = v[2];
-}
-
-double eval_updown(Animat *A) 
-{
-    dReal rup[3], rdown[3], rstop[3];
-    upDown = 1.0;
-    myprintf("Up ");
-    prim_eval_v(A, rup);
-    upDown = -1.0;              // Not sure if the neurons are [1,-1] or [1,0].
-    myprintf("Down ");
-    prim_eval_v(A, rdown);
-    upDown = 0.0;
-    myprintf("Stop ");
-    prim_eval_v(A, rstop);
-    
-    // Let's project everything into the x-y plane at z = 0.
-    rup[2] = rdown[2] = rstop[2] = 0.0;
-
-    // Let a be the angle between rup and y positive, (0,1,0).  
-    double a = acos(rup[1]/norm2(rup));
-    dReal rupn[3], rdownn[3];
-
-    rotate(rupn, a, rup);
-    rotate(rdownn, a, rdown);
-    
-
-    double fitness = fabs(rupn[1])/(1.0 
-                                    + fabs(rupn[0]) + fabs(rdownn[0]) 
-                                    + norm2(rstop));
-    if (rdownn[1] > 0.0) {
-        fitness *= fabs(rdownn[1]);
-    } else {
-        fitness /= (1.0 + fabs(rdownn[1]));
-    }
-    myprintf("Eval_updown: %f\n", fitness);
-    return fitness;
-}
-
-
 
 int my_mkdir(char* name) {
     return mkdir(name, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -344,7 +157,7 @@ int my_mkdir(char* name) {
 
 int main2 (int argc, char **argv)
 {
-    
+
     if (argc != 2) {
         fprintf(stderr, "run <result-dir>\n");
         return 2;
@@ -380,6 +193,31 @@ bool evaluate_individ(vector<double>& fitness, Individual* individ)
   return true;
 }
 
+double eval(Animat *A) 
+{
+    double a, b;
+    
+    switch(fitness_type) {
+    case RUN:
+        return prim_eval(A);
+    case GOSTOP:
+        goStop = 1.0;
+        a = prim_eval(A);
+        goStop = 0.0;
+        b = prim_eval(A);
+        return a/((b + 1.0)*(b + 1.0));
+    case UPDOWN:
+        double eval_updown(Animat *A);
+        return eval_updown(A);
+    case FOURWAY:
+        double eval_fourway(Animat *A);
+        return eval_fourway(A);
+    default:
+        myprintf("no fitness_type %d\n", fitness_type);
+        abort();
+    }
+}
+
 void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
 {
   pop->set_save_best(true);
@@ -387,7 +225,7 @@ void setup_pop_gen(Individual* individ_config, AlpsGen* pop)
   int age_gap = 5;
   int age_scheme = ALPS_AGING_FIBONACCI1;
   int Number_Layers = -1;
-  int type = 2; // Set the population type here.
+  int type = 1; // Set the population type here.
   if (type == 1) {
     // Configuration for a regular EA/GA:
     Number_Layers = 1;
@@ -466,10 +304,11 @@ void *ea_engine(void *arg1)
       pop->insert_evaluated(fitness, index, individ, 0);
     }
     // How do I know when a generation is over?
+    //pop->write("pop.data");
   }
   // Let's save the best one.
-  Individ_Animat* ind = (Individ_Animat*) pop->get_individual(0);
-  ind->animat->save("best.json");
+  //Individ_Animat* ind = (Individ_Animat*) pop->get_individual(0);
+  //ind->animat->save("best.json");
   printf("EA engine ended.\n");
 
   return 0;
@@ -484,8 +323,16 @@ void usage() {
     fprintf(stderr, "         3. four way\n");
 }
 
-int main(int argc, char **argv) {
+void testStuff() {
+    dReal r[3] = {0.0,12.0,0.0}, n[3] = {1.0,0.0,0.0};
+    double f;
+    f = fitness_part(r,n);
+    myprintf("fitness part = %f\n", f);
+    exit(1);
+}
 
+int main(int argc, char **argv) {
+    //testStuff();
     int c;
     
     opterr = 0;

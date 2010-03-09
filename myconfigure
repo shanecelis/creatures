@@ -1,0 +1,5 @@
+#!/bin/bash
+odedir="/usr/local"
+export CPPFLAGS="-I$odedir/include -I/opt/local/include -I/usr/X11/include"
+export LDFLAGS="-L$odedir/lib/ -L/opt/local/lib -L/usr/X11/lib"
+./configure "$@"

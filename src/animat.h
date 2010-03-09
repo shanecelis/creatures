@@ -64,7 +64,7 @@ void myexit(int i);
 #define MAXRECUR 3
 #define NBCYCLES 10000000
 #define INITIALDIST 1.5
-#define MYRANDSEED 0 //  if 0, then random seed is taken from /dev/urandom
+#define MYRANDSEED 1 //  if 0, then random seed is taken from /dev/urandom
 #define SIDE (1.0f)	// side length of a box
 #define MAXFORCE 4 // 3 ?
 #define NBNEURCYCLES 2  // 2 ?
@@ -118,7 +118,8 @@ void myexit(int i);
 // forces limb 0 to possess a SENSCLOSESTANIMX and SENSCLOSESTANIMY sensor.
 #define ENFORCESENSORSINTRUNK 0
 
-#define NBSENSORTYPES 1
+// XXX animat.cpp L17
+#define NBSENSORTYPES 2
 
 
 void airCallback(void *data, dGeomID o1, dGeomID o2);

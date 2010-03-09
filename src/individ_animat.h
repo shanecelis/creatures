@@ -117,12 +117,25 @@ class Individ_Animat : public Individual {
 /*     bool make_phenotype(); */
 /*     std::istream& read(std::istream& istr); */
     std::ostream& write(std::ostream& ostr) {
-        char filename[255];
-        double fitness = Individual::get_fitness();
-        sprintf(filename, "best-%.3d.json", save_count);
-        cerr << "write individual with fitness " << fitness << " to file " << filename << endl;
-        save_count++;
+        /* char filename[255]; */
+        /* double fitness = Individual::get_fitness(); */
+        /* sprintf(filename, "best-%.3d.json", save_count); */
+        /* cerr << "write individual with fitness " << fitness << " to file " << filename << endl; */
+        /* save_count++; */
+        /* animat->save(filename); */
+
+        double fitness = Individual::get_fitness(); 
+        // Write it to a temporary file first, then read that and
+        // output it to the stream.  (C++ and C interacting, badly.)
+        char filename [L_tmpnam];
+        tmpnam(filename);
         animat->save(filename);
+        cerr << "write individual with fitness " << fitness << " to file " << filename << endl; 
+        std::fstream ifs(filename);
+        if (!ifs) {
+            //std::stringstream oss;
+            ostr << ifs.rdbuf();
+        }
         return ostr;
     }
 

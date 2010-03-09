@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-
+#include "animat_eval.h"
 
 #define WAITTIME 1000
 #define TIMEEVAL 10000
@@ -25,12 +25,6 @@ dReal newPos[3];
 
 typedef enum { drop, settled, go, record } SimState;
 SimState state = drop;
-dReal epsilon = 0.0001;
-
-dReal norm2sq(const dReal *a)
-{
-    return a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
-}
 
 void simLoop2 (int pause)
 {
@@ -41,8 +35,8 @@ void simLoop2 (int pause)
         simLoopPlus(pause, false);
         const dReal *vel = dBodyGetLinearVel(Ani1.limbs[0].id);
         const dReal *angvel = dBodyGetAngularVel(Ani1.limbs[0].id);
-        dReal velsq = norm2sq(vel);
-        dReal angvelsq = norm2sq(angvel);
+        dReal velsq = norm2sq((dReal*)vel);
+        dReal angvelsq = norm2sq((dReal*)angvel);
         //myprintf("\nvelsq: %f angvelsq: %f", velsq, angvelsq);
         if (velsq < epsilon && angvelsq < epsilon) {
             settledCount++;
@@ -97,26 +91,46 @@ void keypressed(int cmd)
     case 'w':
         if (upDown == 1.0) {
             myprintf("\nstop\n");
-            upDown == 0.0;
+            upDown = 0.0;
+            leftRight = 0.0;
         } else {
             upDown = 1.0;
+            leftRight = 0.0;
             myprintf("\nup\n");
         }
         break;
     case 's':
         if (upDown == -1.0) {
             myprintf("\nstop\n");
-            upDown == 0.0;
+            upDown = 0.0;
+            leftRight = 0.0;
         } else {
             upDown = -1.0;
+            leftRight = 0.0;
             myprintf("\ndown\n");
         }
         break;
     case 'a':
-        myprintf("\nleft\n");
+        if (leftRight == -1.0) {
+            myprintf("\nstop left right\n");
+            leftRight = 0.0;
+            upDown = 0.0;
+        } else {
+            leftRight = -1.0;
+            upDown = 0.0;
+            myprintf("\nleft\n");
+        }
         break;
     case 'd':
-        myprintf("\nright\n");
+        if (leftRight == 1.0) {
+            myprintf("\nstop right\n");
+            leftRight = 0.0;
+            upDown = 0.0;
+        } else {
+            leftRight = 1.0;
+            upDown = 0.0;
+            myprintf("\nright\n");
+        }
         break;
     case 'g':
         if (goStop == 0.0) {
@@ -145,7 +159,8 @@ void initScene2()
     fn.step = &simLoop2;
     fn.command = &keypressed;
     goStop = 1.0;
-    upDown = 0.0;
+    upDown = 1.0;
+    leftRight = 0.0;
 }
 
 void usage()

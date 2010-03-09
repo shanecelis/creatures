@@ -35,7 +35,7 @@ AC_SUBST(OS)
 case $OS in
      Darwin)
         #DRAWSTUFF_DEP="-lm -framework OpenGL -framework GLUT -framework AGL -framework Carbon -lstdc++";
-        DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS -lstdc++";
+        DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS -lstdc++ -lX11";
         ;;
      Linux)
         DRAWSTUFF_DEP="$GL_LIBS $GLU_LIBS $GLUT_LIBS";

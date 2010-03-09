@@ -13,7 +13,9 @@
 //                                SENSCLOSESTANIMY, SENSTOUCH, SENSUPDOWN, SENSLEFTRIGHT };
 
 //int SENSORTYPES[NBSENSORTYPES] = { SENSGOSTOP };
-int SENSORTYPES[NBSENSORTYPES] = { SENSUPDOWN };
+//int SENSORTYPES[NBSENSORTYPES] = { SENSUPDOWN };
+// XXX animat.h L121
+int SENSORTYPES[NBSENSORTYPES] = { SENSUPDOWN, SENSLEFTRIGHT };
 
 // UNCOMMENT THIS (and comment out the previous passage) IF YOU WON'T USE THE
 // BALL/BOX IN YOUR SIMULATIONS
@@ -265,7 +267,8 @@ void Animat::generate(dReal nx, dReal ny, dReal alpha)
     space = dSimpleSpaceCreate(globalspace);
     idxgen = 0;
     transGenome();
-    printGenome(); printRepres();
+    printGenome(); 
+    printRepres();
     //displayRepres();
     readRepres (0, 0, 0, alpha);  
     dGeomGetAABB ((dGeomID)space, aabb);
