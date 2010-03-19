@@ -34,9 +34,9 @@ readspheric_LDFLAGS = $(LDFLAGS)
 visual_SOURCES = visual.cpp 
 visual_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
 readrun_SOURCES = readrun.cpp 
-readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+readrun_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS) -lga
 readgrab_SOURCES = readgrab.cpp 
-readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS)
+readgrab_LDFLAGS = $(LDFLAGS) $(DRAWSTUFF_LIBS) 
 endif
 #hello_SOURCES = main.c
 #hello_LDADD = libhello.la

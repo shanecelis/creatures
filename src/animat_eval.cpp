@@ -1,10 +1,13 @@
 #include "animat_eval.h"
 
-#define WAITTIME   1000 // Time to leave the body in simulation before, recording anything.
-#define TIMEEVAL   8000 // you can get good results with much less (eg 8-9000)
-#define PRELIMTIME  250
 
 dReal epsilon = 0.0001;
+
+void vset(dReal *a, dReal *b) {
+    a[0] = b[0];
+    a[1] = b[1];
+    a[2] = b[2];
+}
 
 // a `dot` b = c
 dReal dot(dReal *a, dReal *b) {
@@ -124,6 +127,63 @@ int prim_eval_v(Animat *A, dReal* result)
     
     return 0;
 }
+
+// typedef int (*callback)(int timestep, Animat *A, void *userdata);
+
+// int vector_record(int timestep, Animat *A, void *userdata)
+// {
+//     if (timestep == 0) {
+        
+//     }
+        
+// }
+
+
+
+int eval_callback(Animat *A, Process *f)
+{
+    int nbsteps;
+    resetScene();
+
+    A->generate(0,0,0);
+    A->pushBehindXVert(0);
+
+    for (nbsteps = 0; nbsteps < WAITTIME; nbsteps++) {
+        try {
+            doWorld(0, STEP, true, false);
+            const dReal *vel = dBodyGetLinearVel(A->limbs[0].id);
+            const dReal *angvel = dBodyGetAngularVel(A->limbs[0].id);
+            dReal velsq = norm2sq((dReal*) vel);
+            dReal angvelsq = norm2sq((dReal*) angvel);
+            //myprintf("\nvelsq: %f angvelsq: %f", velsq, angvelsq);
+            if (velsq < epsilon && angvelsq < epsilon) {
+                break;
+            }
+        } catch (...) {
+            A->remove();
+            return 1;
+        }
+    }
+
+    for (nbsteps = 0; nbsteps < TIMEEVAL; nbsteps++) {
+        try {
+            if (f)
+                f->timestep(nbsteps, TIMEEVAL, A);
+            doWorld(0, STEP, true, true);
+        } catch (...) {
+            A->remove();
+            return 2;
+        }
+    }
+
+    if (f)
+        f->timestep(nbsteps, TIMEEVAL, A);
+
+    
+    A->remove();
+    return 0;
+}
+
 
 double prim_eval(Animat *A)
 {
@@ -274,6 +334,7 @@ double eval_fourway(Animat *A)
 double fitness_part(dReal *r, dReal *n) {
     dReal d[3],e[3];
     double s, f;
+    double p = 0.5;
     scalarMult(dot(r, n), n, d);
     sub(r, d, e);
     if (norm2(d) > 0.0) {
@@ -281,7 +342,7 @@ double fitness_part(dReal *r, dReal *n) {
     } else {
         s = 0.0;
     }
-    f = pow((double)(1.0 + norm2(d)), s) * pow((double)(1.0 + norm2(e)), -1.0);
+    f = pow((double)(1.0 + norm2(d)), s) * pow((double)(1.0 + norm2(e)), -p);
     return f;
 }
 
@@ -311,5 +372,30 @@ int isColliding(Animat *elim)
         }
     elim->remove();
     NOACTUATE=0;
+    return 0;
+}
+
+int endsWith(char *str, char *substring)
+{
+    int l = strlen(str);
+    int m = strlen(substring);
+    //printf("%s\n", str + l - m);
+    if (l > m) {
+        return strcmp(str + l  - m, substring) == 0;
+    } else {
+        return 0;
+    }
+}
+
+int readAnimat(char *s, Animat *a)
+{
+    if (endsWith(s, ".json")) {
+        a->read(s);
+    } else if (endsWith(s, ".bin")) {
+        a->readOld(s);
+    } else {
+        printf("nope\n");
+        return 1;
+    }
     return 0;
 }

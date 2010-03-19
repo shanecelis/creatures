@@ -64,7 +64,7 @@ void myexit(int i);
 #define MAXRECUR 3
 #define NBCYCLES 10000000
 #define INITIALDIST 1.5
-#define MYRANDSEED 1 //  if 0, then random seed is taken from /dev/urandom
+#define MYRANDSEED 0 //  if 0, then random seed is taken from /dev/urandom
 #define SIDE (1.0f)	// side length of a box
 #define MAXFORCE 4 // 3 ?
 #define NBNEURCYCLES 2  // 2 ?
@@ -101,6 +101,7 @@ void myexit(int i);
 #define SENSGOSTOP 9
 #define SENSUPDOWN 10
 #define SENSLEFTRIGHT 11
+#define SENSSINUSOID 12
 
 
 #define REFBOTH 44
@@ -119,7 +120,7 @@ void myexit(int i);
 #define ENFORCESENSORSINTRUNK 0
 
 // XXX animat.cpp L17
-#define NBSENSORTYPES 2
+#define NBSENSORTYPES 3
 
 
 void airCallback(void *data, dGeomID o1, dGeomID o2);
@@ -522,21 +523,26 @@ public:
     void read(const char *s)
     {
         from_json(json_object_from_file((char *) s));
-        /*
-          FILE *f = fopen(s, "r");
-          fread (this->genome, 1, sizeof(genome), f);
-          fflush(f);
-          fclose(f);
-        */
+
+        /* char sbin[255]; */
+        /* sprintf(sbin, "%s.bin", s); */
+        /* readOld(sbin); */
+        /* FILE *f = fopen(sbin, "r"); */
+        /* fread (this->genome, 1, sizeof(genome), f); */
+        /* fflush(f); */
+        /* fclose(f); */
     }
     void save(const char *s)
     {
         json_object_to_file((char *) s, to_json());
-/*
-  FILE *f = fopen(s, "w");
-  fwrite (this->genome, 1, sizeof(genome), f);
-  fflush(f);
-  fclose(f);*/
+
+        /* char sbin[255]; */
+        /* sprintf(sbin, "%s.bin", s); */
+        /* saveOld(sbin); */
+        /* FILE *f = fopen(sbin, "w"); */
+        /* fwrite (this->genome, 1, sizeof(genome), f); */
+        /* fflush(f); */
+        /* fclose(f); */
     }
 
     void saveJson(const char *s)

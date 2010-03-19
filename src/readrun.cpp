@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "animat_eval.h"
+#include "AnimatGenome.h"
 
-#define WAITTIME 1000
-#define TIMEEVAL 10000
-#define PRELIMTIME 1000
+// #define WAITTIME 1000
+// #define TIMEEVAL 10000
+// #define PRELIMTIME 1000
 
 #define SETTLEDMAX 10
 //static double *trunkpos;
@@ -22,6 +23,8 @@ int settledCount = 0;
 double *Apos, *Bpos, dist1, dist2, bestdist1, bestdist2, result;
 dReal oldPos[3];
 dReal newPos[3];
+Process *p = NULL;
+int t = 0;
 
 typedef enum { drop, settled, go, record } SimState;
 SimState state = drop;
@@ -29,7 +32,6 @@ SimState state = drop;
 void simLoop2 (int pause)
 {
 
-    
     if (state == drop) {
         // Run without brains.
         simLoopPlus(pause, false);
@@ -51,6 +53,7 @@ void simLoop2 (int pause)
             oldPos[2] = pos[2];
             tot_time = 0;
             myprintf("\nsettled.\n");
+            t = -1;
         }
     } else {
         // Turn the brains on.
@@ -61,6 +64,9 @@ void simLoop2 (int pause)
         newPos[1] = pos[1];
         newPos[2] = pos[2];
         dsDrawLine(oldPos, newPos);
+
+        if (p)
+            p->timestep(t, TIMEEVAL, &Ani1);
 
         if (tot_time == TIMEEVAL) {
             
@@ -77,12 +83,13 @@ void simLoop2 (int pause)
                 Ani1.remove();
                 resetScene();
                 Ani1.generate(0, 0, 0);
-                //Ani1.setImmunityTimer(PRELIMTIME);
                 Ani1.pushBehindXVert(0);
                 state = drop;
             }
         }
     }
+    t++;
+
 }
 
 void keypressed(int cmd) 
@@ -170,6 +177,7 @@ void usage()
     fprintf(stderr, "       -t timeout\n");
 }
 
+
 int main (int argc, char **argv)
 {
     int c;
@@ -210,7 +218,7 @@ int main (int argc, char **argv)
     WORLDTYPE = FLATWORLD;
     BALL = 0;
     initScene2();
-    Ani1.read(argv[0]);
+    readAnimat(argv[0], &Ani1);
  
     VISUAL = 1;
     
@@ -226,6 +234,8 @@ int main (int argc, char **argv)
     Ani1.setImmunityTimer(PRELIMTIME);
     Ani1.displayRepres();
 	Ani1.pushBehindXVert(0);
+
+    p = new FourwayContProcess();
     
     printf("OK\n");
     dsSimulationLoop (argc,argv,352,288,&fn);

@@ -23,14 +23,16 @@ public:
     static float Compare(const GAGenome&, const GAGenome&);
     //static float Evaluate(GAGenome&);
     static float fourway(GAGenome&);
+    static float fourwayCont(GAGenome&);
     static float run(GAGenome&);
+    static float run2(GAGenome&);
     static int Cross(const GAGenome&, const GAGenome&, GAGenome*, GAGenome*);
 
 public:
 
     Animat *animat;
-AnimatGenome(Evaluator eval = run) : GAGenome(Init, Mutate, Compare) { 
-        animat = NULL;
+AnimatGenome(Evaluator eval = fourwayCont) : GAGenome(Init, Mutate, Compare) { 
+        animat = new Animat();
         Init(*this);
         evaluator(eval); 
         crossover(Cross); 
@@ -55,7 +57,6 @@ AnimatGenome(Evaluator eval = run) : GAGenome(Init, Mutate, Compare) {
     virtual int read(STD_ISTREAM &);
     virtual int write(STD_OSTREAM &ostr)const ;
 #endif
-
 
 // any data/member functions specific to this new class
 };
@@ -129,6 +130,125 @@ AnimatGenome::run(GAGenome& a) {
     return (float) prim_eval(g.animat);
 }
 
+float
+AnimatGenome::run2(GAGenome& a) {
+    //return GARandomFloat(0.0, 10.0);
+    AnimatGenome& g = (AnimatGenome&) a;
+    DistanceProcess d;
+    eval_callback(g.animat, &d);
+    return d.distance();
+}
+
+class FourwayContProcess : public Process {
+public:
+    dReal beginPos[3];
+    dReal endPos[3];
+    dReal rup[3];
+    dReal rdown[3];
+    dReal rstop[3];
+    dReal rleft[3];
+    dReal rright[3];
+    dReal *values[5];
+    int sections;
+    int delta;
+    int section;
+    FourwayContProcess() {
+        values[0] = rstop;
+        values[1] = rup;
+        values[2] = rleft;
+        values[3] = rdown;
+        values[4] = rright;
+        sections = 5;
+        section = 0;
+    }
+    
+    void setNeurons(int section) {
+        cerr << "debug: setting neurons for section " << section << "\n";
+        switch (section) {
+        case 0: upDown = 0.0; leftRight = 0.0; break;
+        case 1: upDown = 1.0; leftRight = 0.0; break;
+        case 2: upDown = 0.0; leftRight = -1.0; break;
+        case 3: upDown = -1.0; leftRight = 0.0; break;
+        case 4: upDown = 0.0; leftRight = 1.0; break;
+        default:
+            cerr << "error: setNeurons got section " << section << "\n";
+        }
+    }
+
+    int timestep(int timestep, int lastTimestep, Animat *A)
+    {
+        dReal *pos;
+        if (timestep == 0) {
+            delta = lastTimestep/sections;
+        } 
+        if (timestep == lastTimestep + 1) {
+            cout << "fourwayContFitness: " << fitness() << "\n";
+            return 0;
+        } else if (timestep > lastTimestep + 1) {
+            return 0;
+        }
+        
+        if (timestep == (section + 1) * delta || timestep == lastTimestep) {
+            // End of this section
+            pos = A->getAvgPos();
+            vset(endPos, pos);
+            sub(beginPos, endPos, values[section]);
+            myprintf("Section %d: {%f, %f, %f}\n", section, values[section][0], 
+                     values[section][1], 
+                     values[section][2]);
+                    
+
+            section++;
+        }
+
+        if (timestep == section * delta && section != sections) {
+            // Beginning of this section
+            setNeurons(section);
+            pos = A->getAvgPos();
+            vset(beginPos, pos);
+        }  
+
+    }
+
+    float fitness() {
+        // Let's project everything into the x-y plane at z = 0.
+        rup[2] = rdown[2] = rstop[2] = rleft[2] = rright[2] = 0.0;
+        
+        // Let a be the angle between rup and y positive, (0,1,0).  
+        double a = acos(rup[1]/norm2(rup));
+        dReal n[3] = {0.0,0.0,0.0};
+        double fitness = fitness_part(rstop, n);
+        
+        normalize(rup, n);
+        fitness *= fitness_part(rup, n);
+        rotate(n, M_PI_2, n);
+        fitness *= fitness_part(rleft, n);
+        rotate(n, M_PI_2, n);
+        fitness *= fitness_part(rdown, n);
+        rotate(n, M_PI_2, n);
+        fitness *= fitness_part(rright, n);
+        
+        dReal amean[3], std[3];
+
+        mean(5, values, amean);
+        stddev(5, values, amean, std);
+        fitness *= (norm2(amean) + norm2(std));
+        myprintf("Eval_fourwayCont: %f\n", fitness);
+        return fitness;
+    }
+};
+
+
+float
+// four way continuous.
+AnimatGenome::fourwayCont(GAGenome& a) {
+    //return GARandomFloat(0.0, 10.0);
+    AnimatGenome& g = (AnimatGenome&) a;
+    FourwayContProcess d;
+    eval_callback(g.animat, &d);
+    return d.fitness();
+}
+
 int
 AnimatGenome::Cross(const GAGenome& mom, const GAGenome& dad,
                     GAGenome* sis, GAGenome* bro){
@@ -179,7 +299,7 @@ int AnimatGenome::write(STD_OSTREAM &ostr) const
     std::ifstream ifs(filename);
     if (ifs.good()) {
         //std::stringstream oss;
-        ostr << this->evaluate() << "\n";
+        ostr << this->evaluate() << "\n"; // write the fitness
         ostr << ifs.rdbuf();
     } else {
         cerr << "Unable to read from temp file "<< filename <<".\n";

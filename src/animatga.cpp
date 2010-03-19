@@ -45,7 +45,7 @@ main(int argc, char **argv)
 
 // Declare variables for the GA parameters and set them to some default values.
 
-  int popsize  = 50;
+  int popsize  = 300;
   int ngen     = 100;
   float pmut   = 0.000;
   float pcross = 0.0;
@@ -75,6 +75,7 @@ main(int argc, char **argv)
   ga.selectScores(GAStatistics::AllScores);
   ga.scoreFilename("scores.data");
   ga.selector(GARouletteWheelSelector());
+  ga.scaling(GANoScaling());
   //ga.evolve();
   for (int i = 0;! ga.done(); i++) {
       char filename[255];
@@ -89,7 +90,7 @@ main(int argc, char **argv)
       my_mkdir(dirname);
       for (int j = 0; j < popsize; j++) {
           char indfile[255];
-          sprintf(indfile, "%s/ind%.3d.json", dirname, j);
+          sprintf(indfile, "%s/ind%.3d.gen", dirname, j);
           ofstream ind(indfile);
           if (ind) {
               ind << pop.best(j);
@@ -97,6 +98,11 @@ main(int argc, char **argv)
           } else {
               cerr << "error: Unable to write to " << indfile << "\n";
           }
+          AnimatGenome& g = (AnimatGenome&) pop.best(j);
+          sprintf(indfile, "%s/ind%.3d.json", dirname, j);
+          g.animat->save(indfile);
+          sprintf(indfile, "%s/ind%.3d.bin", dirname, j);
+          g.animat->saveOld(indfile);
       }
       ga.step();
 

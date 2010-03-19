@@ -15,7 +15,7 @@
 //int SENSORTYPES[NBSENSORTYPES] = { SENSGOSTOP };
 //int SENSORTYPES[NBSENSORTYPES] = { SENSUPDOWN };
 // XXX animat.h L121
-int SENSORTYPES[NBSENSORTYPES] = { SENSUPDOWN, SENSLEFTRIGHT };
+int SENSORTYPES[NBSENSORTYPES] = { SENSSINUSOID, SENSUPDOWN, SENSLEFTRIGHT };
 
 // UNCOMMENT THIS (and comment out the previous passage) IF YOU WON'T USE THE
 // BALL/BOX IN YOUR SIMULATIONS
@@ -35,6 +35,7 @@ int BALL = 0;
 int CORRIDOR = 0;
 int WALLS = 0;
 
+dReal simtime = 0.0;
 dReal GRAVCORR = 4.0 / (dReal) WORLDRADIUS;
 dWorldID world;
 dMatrix3 IDENTITY;
@@ -663,6 +664,17 @@ void Animat::fillSensors()
                     repres[i].neurons[neur].out = 0;
                 //myprintf("%.6f\n", repres[i].neurons[neur].out);
             }
+            if (repres[i].neurons[neur].type == SENSSINUSOID)
+            {
+                dReal x = (repres[i].neurons[neur].threshold + 3.0/2.0)/3.0;
+                if (x > 1.0) 
+                    myprintf("x is too big; x = %f\n", x);
+                repres[i].neurons[neur].out = sin(simtime * x * M_PI * 2.0);
+                if (DISABLESENSORS)
+                    repres[i].neurons[neur].out = 0;
+                //myprintf("%.6f\n", repres[i].neurons[neur].out);
+            }
+
         }
     }
 }
@@ -1146,6 +1158,7 @@ void doWorld (int pause, dReal step, int fast, int useBrains)
             dWorldQuickStep(world, step); // quick, default
         else
             dWorldStep (world,step); // slower, more precise
+        simtime += step; // Let's keep track of time in float form.
         tot_time++;
     }
     dJointGroupEmpty (contactgroup);
