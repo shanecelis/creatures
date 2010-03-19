@@ -126,6 +126,7 @@ AnimatGenome::fourway(GAGenome& a) {
 float
 AnimatGenome::run(GAGenome& a) {
     //return GARandomFloat(0.0, 10.0);
+    printf("run! evaluator\n");
     AnimatGenome& g = (AnimatGenome&) a;
     return (float) prim_eval(g.animat);
 }

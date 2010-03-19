@@ -1242,6 +1242,8 @@ void resetScene()
         ball.remove();
         ball.generate();
     }
+    simtime = 0.0;
+    tot_time = 0;
 }
 
 void destroyWorld()
@@ -1306,6 +1308,7 @@ void initWorld()
     dWorldSetCFM (world, MYCFM);//0.05 // was 1e-5 - too low // .1 bad
     dWorldSetERP (world, MYERP); // should NOT be 0.5+ (too springy)*/
     tot_time = 0;
+    simtime = 0.0;
     numround = 0;
     if (WORLDTYPE == SPHERICWORLD)
     {

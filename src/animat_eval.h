@@ -57,6 +57,8 @@ public:
             newPos[0] = pos[0];
             newPos[1] = pos[1];
             newPos[2] = pos[2];
+
+            myprintf("distanceProcess -> %f\n", distance());
         }
     }
 

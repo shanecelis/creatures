@@ -45,7 +45,7 @@ main(int argc, char **argv)
 
 // Declare variables for the GA parameters and set them to some default values.
 
-  int popsize  = 300;
+  int popsize  = 20;
   int ngen     = 100;
   float pmut   = 0.000;
   float pcross = 0.0;
@@ -76,6 +76,7 @@ main(int argc, char **argv)
   ga.scoreFilename("scores.data");
   ga.selector(GARouletteWheelSelector());
   ga.scaling(GANoScaling());
+  ga.objectiveFunction(AnimatGenome::run);
   //ga.evolve();
   for (int i = 0;! ga.done(); i++) {
       char filename[255];

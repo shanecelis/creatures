@@ -52,7 +52,7 @@ void myexit(int i);
 #define REGISTSIZE  100
 
 
-#define PROBAMUT  2//4 // probability of mutation - TRY TO INCREASE THIS !
+#define PROBAMUT  4 // probability of mutation - TRY TO INCREASE THIS !
 #define WORLDRADIUS 15 // for spherical world
 #define DROPHEIGHT 10 // for spherical world
 #define HURTIMMUNITYTIMER 200
@@ -64,7 +64,7 @@ void myexit(int i);
 #define MAXRECUR 3
 #define NBCYCLES 10000000
 #define INITIALDIST 1.5
-#define MYRANDSEED 0 //  if 0, then random seed is taken from /dev/urandom
+#define MYRANDSEED 1 //  if 0, then random seed is taken from /dev/urandom
 #define SIDE (1.0f)	// side length of a box
 #define MAXFORCE 4 // 3 ?
 #define NBNEURCYCLES 2  // 2 ?

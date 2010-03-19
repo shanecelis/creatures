@@ -156,13 +156,33 @@ void keypressed(int cmd)
             brains = 1;
             myprintf("\nbrains on\n");
         }
+        break;
+    case 'r':
+        void reload();
+        reload();
+        break;
     }
     
+}
+
+void reload()
+{
+    //destroyWorld();
+    //initWorld();
+    resetScene();
+    Ani1.generate(0, 0, 0);
+    Ani1.setImmunityTimer(PRELIMTIME);
+    Ani1.displayRepres();
+	Ani1.pushBehindXVert(0);
+
+    //p = new FourwayContProcess();
+    p = new DistanceProcess();
 }
 
 void initScene2()
 {
     initWorld();
+    
     fn.step = &simLoop2;
     fn.command = &keypressed;
     goStop = 1.0;
@@ -217,7 +237,6 @@ int main (int argc, char **argv)
     OUTPUTREDIRECT = TOSTDOUT;
     WORLDTYPE = FLATWORLD;
     BALL = 0;
-    initScene2();
     readAnimat(argv[0], &Ani1);
  
     VISUAL = 1;
@@ -228,14 +247,11 @@ int main (int argc, char **argv)
       for (int k=0; k < MAXCONFROM; k++)
       Ani1.genome[i].neurons[j].confrom[k].reftype = REFBOTH;*/
 
-    resetScene();
+    initScene2();
+    reload();
+    //resetScene();
 
-    Ani1.generate(0, 0, 0);
-    Ani1.setImmunityTimer(PRELIMTIME);
-    Ani1.displayRepres();
-	Ani1.pushBehindXVert(0);
 
-    p = new FourwayContProcess();
     
     printf("OK\n");
     dsSimulationLoop (argc,argv,352,288,&fn);
